@@ -1,27 +1,14 @@
 'use client';
 
-import {
-  Box,
-  VStack,
-  Text,
-  Spacer,
-  useDisclosure,
-  Link,
-  HStack,
-} from '@chakra-ui/react';
+import { Box, VStack, Text, useDisclosure } from '@chakra-ui/react';
 import { useAnchorWallet, useWallet } from '@solana/wallet-adapter-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { GridSizeDisplay } from '../../../components/NftGrid';
-import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import OwnerDisplay from '../../../components/OwnerDisplay';
+import { PublicKey } from '@solana/web3.js';
 import CollectionDisplay from '../../../components/CollectionDisplay';
 import ToolsBar from '../../../components/ToolsBar';
-// import {useWorkspace} from '../../../providers/ContextProvider';
-import { BN, utils } from '@coral-xyz/anchor';
-import { infuse } from '../../../infusedCarbonRegistry/client';
 import InfuseModal from '../../../components/infuseModal';
 import InfusedAlert from '../../../components/InfusedAlert';
-import { useRouter } from 'next/router';
 
 export default function Collection({
   params,
@@ -34,7 +21,6 @@ export default function Collection({
   const [searchWallet, setSearchWallet] = useState<string>();
   const [searchingMode, setSearchingMode] = useState<number>(1);
   const [nftToInfuse, setNftToInfuse] = useState<string>();
-  const { program, provider, connection } = useWorkspace();
   const [state, setState] = useState<PublicKey>();
   const {
     isOpen: isInfusedModalOpen,
@@ -52,31 +38,31 @@ export default function Collection({
     onOpen: onAlertOpen,
   } = useDisclosure({ defaultIsOpen: false });
 
-  useEffect(() => {
-    if (!program) return;
-    const [statePda] = PublicKey.findProgramAddressSync(
-      [utils.bytes.utf8.encode('global-registry')],
-      program.programId
-    );
-    setState(statePda);
-  }, [program]);
+  // useEffect(() => {
+  //   if (!program) return;
+  //   const [statePda] = PublicKey.findProgramAddressSync(
+  //     [utils.bytes.utf8.encode('global-registry')],
+  //     program.programId
+  //   );
+  //   setState(statePda);
+  // }, [program]);
 
-  useEffect(() => {
-    const syncWallet = async () => {
-      if (wallet.publicKey && !searchWallet)
-        setSearchWallet(wallet.publicKey.toString());
-    };
-    syncWallet();
-  }, [wallet, connection, searchingMode, searchWallet]);
+  // useEffect(() => {
+  //   const syncWallet = async () => {
+  //     if (wallet.publicKey && !searchWallet)
+  //       setSearchWallet(wallet.publicKey.toString());
+  //   };
+  //   syncWallet();
+  // }, [wallet, connection, searchingMode, searchWallet]);
 
-  useEffect(() => {
-    if (!program) return;
-    const [statePda] = PublicKey.findProgramAddressSync(
-      [utils.bytes.utf8.encode('global-registry')],
-      program.programId
-    );
-    setState(statePda);
-  }, [program]);
+  // useEffect(() => {
+  //   if (!program) return;
+  //   const [statePda] = PublicKey.findProgramAddressSync(
+  //     [utils.bytes.utf8.encode('global-registry')],
+  //     program.programId
+  //   );
+  //   setState(statePda);
+  // }, [program]);
 
   const searchCollectionHandler = (collection: string) => {
     setCollection(collection);
@@ -100,14 +86,13 @@ export default function Collection({
   };
 
   const infuseNft = async (amount: number) => {
-    if (!state) return;
-    if (!program) return;
-    if (!provider) return;
-    if (!connection) return;
-    if (!anchorWallet) return;
-    if (!nftToInfuse) return;
-
-    await infuse(program, new BN(amount), new PublicKey(nftToInfuse));
+    // if (!state) return;
+    // if (!program) return;
+    // if (!provider) return;
+    // if (!connection) return;
+    // if (!anchorWallet) return;
+    // if (!nftToInfuse) return;
+    // await infuse(program, new BN(amount), new PublicKey(nftToInfuse));
   };
 
   return (

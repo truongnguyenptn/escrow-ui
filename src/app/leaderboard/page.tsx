@@ -34,29 +34,28 @@ const Leaderboard = () => {
 
   useEffect(() => {
     const loadAccounts = async () => {
-      if (program) {
-        setIsLoading(true);
-        const infusedAccounts = await baseInfusedAccount();
-        const accountsWithMetadata = await Promise.all(
-          infusedAccounts.map(
-            async (account) => await loadedInfusedAccount(account)
-          )
-        );
-
-        const filteredAccounts = accountsWithMetadata.reduce(
-          (acc: LeaderBoardItem[], cur: LeaderBoardItem) => {
-            if (!acc.map((a) => a.nftMint).includes(cur.nftMint)) {
-              acc.push(cur);
-            }
-            return acc;
-          },
-          []
-        );
-        const sortedAccounts = filteredAccounts.sort(
-          (accountA, accountB) => accountB.carbonScore - accountA.carbonScore
-        );
-        setAccouts(sortedAccounts);
-      }
+      // if (program) {
+      //   setIsLoading(true);
+      //   const infusedAccounts = await baseInfusedAccount();
+      //   const accountsWithMetadata = await Promise.all(
+      //     infusedAccounts.map(
+      //       async (account) => await loadedInfusedAccount(account)
+      //     )
+      //   );
+      //   const filteredAccounts = accountsWithMetadata.reduce(
+      //     (acc: LeaderBoardItem[], cur: LeaderBoardItem) => {
+      //       if (!acc.map((a) => a.nftMint).includes(cur.nftMint)) {
+      //         acc.push(cur);
+      //       }
+      //       return acc;
+      //     },
+      //     []
+      //   );
+      //   const sortedAccounts = filteredAccounts.sort(
+      //     (accountA, accountB) => accountB.carbonScore - accountA.carbonScore
+      //   );
+      //   setAccouts(sortedAccounts);
+      // }
     };
 
     loadAccounts();

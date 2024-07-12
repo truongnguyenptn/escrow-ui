@@ -10,20 +10,47 @@ import {
   HStack,
 } from '@chakra-ui/react';
 import { getProgramInstance } from '@/escrow/program'; // Assuming this file contains getProgramInstance function
+import { Program } from '@coral-xyz/anchor';
+import { AnchorEscrow } from '@/types';
+import { PublicKey } from '@solana/web3.js';
+import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 
 const TakeFromEscrow = () => {
   const [escrowSeed, setEscrowSeed] = useState('');
   const [tokenAAmount, setTokenAAmount] = useState(0);
   const [tokenBAmount, setTokenBAmount] = useState(0);
-  const [program, setProgram] = useState(null); // State to hold the program instance
-
+  const [program, setProgram] = useState<Program<AnchorEscrow>>(); // State to hold the program instance
+  const connection = useConnection();
+  const wallet = useAnchorWallet();
   const takeFromEscrow = async () => {
     if (!program) return; // Ensure program instance is initialized
+
     try {
-      await program.rpc.take(escrowSeed, tokenAAmount, tokenBAmount);
-      console.log('Tokens taken from escrow successfully');
+      // Replace with actual public keys
+      const userAccountPublicKey = new PublicKey(
+        'YOUR_USER_ACCOUNT_PUBLIC_KEY'
+      );
+
+      const takerAtaAPublicKey = new PublicKey('YOUR_TAKER_ATA_A_PUBLIC_KEY');
+      const takerAtaBPublicKey = new PublicKey('YOUR_TAKER_ATA_B_PUBLIC_KEY');
+      const makerAtaBPublicKey = new PublicKey('YOUR_MAKER_ATA_B_PUBLIC_KEY');
+
+      await program.methods
+        .take()
+        .accounts({
+          taker: userAccountPublicKey,
+          takerAtaA: takerAtaAPublicKey,
+          takerAtaB: takerAtaBPublicKey,
+          makerAtaB: makerAtaBPublicKey,
+          vault: new PublicKey('YOUR_VAULT_PUBLIC_KEY'), // Replace with actual vault public key
+          tokenProgram: new PublicKey('TOKEN_PROGRAM_ID'), // Replace with actual token program ID
+        })
+        .signers([
+          /* specify any signers if required */
+        ])
+        .rpc();
     } catch (error) {
-      console.error('Error taking tokens from escrow:', error);
+      console.error('Error taking from escrow:', error);
     }
   };
 
@@ -36,11 +63,11 @@ const TakeFromEscrow = () => {
   // Initialize program instance on component mount
   useEffect(() => {
     const initializeProgram = async () => {
-      const programInstance = await getProgramInstance(); // Assuming getProgramInstance fetches the instance
+      const programInstance = getProgramInstance(connection, wallet); // Assuming getProgramInstance fetches the instance
       setProgram(programInstance);
     };
     initializeProgram();
-  }, []);
+  }, [connection, wallet]);
 
   return (
     <Box

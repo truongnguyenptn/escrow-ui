@@ -10,9 +10,9 @@ import { AnchorEscrow } from "@/types";
 
 export function getProgramInstance(
   connection: ConnectionContextState,
-  wallet: AnchorWallet
+  wallet?: AnchorWallet
 ): Program<AnchorEscrow> {
-  if (!wallet.publicKey) throw new WalletNotConnectedError();
+  if (!wallet?.publicKey) throw new WalletNotConnectedError();
 
   const provider = new AnchorProvider(
     connection.connection,
@@ -32,6 +32,7 @@ export function getProgramInstance(
     escrow as AnchorEscrow,
     provider
   );
+
 
   return program;
 }

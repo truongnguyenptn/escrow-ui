@@ -5,7 +5,6 @@
 //   InfusedAccount,
 //   LeaderBoardItem,
 // } from '../leaderboard/InfusedAccount';
-// import { useWorkspace } from '../providers/ContextProvider';
 
 // // const program = anchor.workspace
 // //   .InfusedCarbonRegistry as anchor.Program<InfusedCarbonRegistry>;
