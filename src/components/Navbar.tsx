@@ -81,22 +81,22 @@ export default function WithSubnavigation() {
               ml={5}
               alignItems="center"
             >
-              <Link href="/" >
-              <Text
-                fontWeight="semibold"
-                textTransform="uppercase"
-                letterSpacing="wide"
-                fontSize={{
-                  base: 'xl',
-                  md: '2xl',
-                }}
-                color="white"
-                onClick={() => {
-                  window.location.href = '/';
-                }}
-              >
-                Escrow
-              </Text>
+              <Link href="/">
+                <Text
+                  fontWeight="semibold"
+                  textTransform="uppercase"
+                  letterSpacing="wide"
+                  fontSize={{
+                    base: 'xl',
+                    md: '2xl',
+                  }}
+                  color="white"
+                  onClick={() => {
+                    window.location.href = '/';
+                  }}
+                >
+                  Escrow
+                </Text>
               </Link>
             </Flex>
           </Flex>
@@ -296,5 +296,9 @@ const NAV_ITEMS: Array<NavItem> = [
   {
     label: 'Take escrow',
     href: '/take',
+  },
+  {
+    label: 'Make escrow',
+    href: '/make',
   },
 ];

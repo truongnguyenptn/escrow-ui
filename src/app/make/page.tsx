@@ -15,49 +15,44 @@ import { AnchorEscrow } from '@/types';
 import { PublicKey } from '@solana/web3.js';
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 
-const TakeFromEscrow = () => {
+const MakeEscrow = () => {
   const [escrowSeed, setEscrowSeed] = useState('');
-  const [tokenAAmount, setTokenAAmount] = useState(0);
-  const [tokenBAmount, setTokenBAmount] = useState(0);
+  const [tokenADeposit, setTokenADeposit] = useState(0);
+  const [tokenBReceive, setTokenBReceive] = useState(0);
   const [program, setProgram] = useState<Program<AnchorEscrow>>(); // State to hold the program instance
   const connection = useConnection();
   const wallet = useAnchorWallet();
-  const takeFromEscrow = async () => {
-    if (!program) return; // Ensure program instance is initialized
+
+  const makeEscrow = async () => {
+    if (!program || !wallet) return; // Ensure program instance and wallet are initialized
 
     try {
-      // Replace with actual public keys
-      const userAccountPublicKey = new PublicKey(
-        'YOUR_USER_ACCOUNT_PUBLIC_KEY'
-      );
-
-      const takerAtaAPublicKey = new PublicKey('YOUR_TAKER_ATA_A_PUBLIC_KEY');
-      const takerAtaBPublicKey = new PublicKey('YOUR_TAKER_ATA_B_PUBLIC_KEY');
-      const makerAtaBPublicKey = new PublicKey('YOUR_MAKER_ATA_B_PUBLIC_KEY');
+      const userAccountPublicKey = wallet.publicKey;
+      const makerAtaAPublicKey = new PublicKey('YOUR_MAKER_ATA_A_PUBLIC_KEY'); // Replace with actual ATA for token A
+      const mintAPublicKey = new PublicKey('YOUR_MINT_A_PUBLIC_KEY'); // Replace with actual mint A public key
+      const mintBPublicKey = new PublicKey('YOUR_MINT_B_PUBLIC_KEY'); // Replace with actual mint B public key
 
       await program.methods
-        .take()
+        .make(new PublicKey(escrowSeed), tokenADeposit, tokenBReceive)
         .accounts({
-          taker: userAccountPublicKey,
-          takerAtaA: takerAtaAPublicKey,
-          takerAtaB: takerAtaBPublicKey,
-          makerAtaB: makerAtaBPublicKey,
+          maker: userAccountPublicKey,
+          mintA: mintAPublicKey,
+          mintB: mintBPublicKey,
+          makerAtaA: makerAtaAPublicKey,
           vault: new PublicKey('YOUR_VAULT_PUBLIC_KEY'), // Replace with actual vault public key
           tokenProgram: new PublicKey('TOKEN_PROGRAM_ID'), // Replace with actual token program ID
         })
-        .signers([
-          /* specify any signers if required */
-        ])
+        .signers([])
         .rpc();
     } catch (error) {
-      console.error('Error taking from escrow:', error);
+      console.error('Error creating escrow:', error);
     }
   };
 
   const handleReset = () => {
     setEscrowSeed('');
-    setTokenAAmount(0);
-    setTokenBAmount(0);
+    setTokenADeposit(0);
+    setTokenBReceive(0);
   };
 
   // Initialize program instance on component mount
@@ -87,19 +82,19 @@ const TakeFromEscrow = () => {
           />
         </FormControl>
         <FormControl>
-          <FormLabel>Token A Amount</FormLabel>
+          <FormLabel>Token A Deposit</FormLabel>
           <Input
             type="number"
-            value={tokenAAmount}
-            onChange={(e) => setTokenAAmount(Number(e.target.value))}
+            value={tokenADeposit}
+            onChange={(e) => setTokenADeposit(Number(e.target.value))}
           />
         </FormControl>
         <FormControl>
-          <FormLabel>Token B Amount</FormLabel>
+          <FormLabel>Token B Receive</FormLabel>
           <Input
             type="number"
-            value={tokenBAmount}
-            onChange={(e) => setTokenBAmount(Number(e.target.value))}
+            value={tokenBReceive}
+            onChange={(e) => setTokenBReceive(Number(e.target.value))}
           />
         </FormControl>
       </VStack>
@@ -107,12 +102,12 @@ const TakeFromEscrow = () => {
         <Button colorScheme="teal" onClick={handleReset}>
           Reset
         </Button>
-        <Button colorScheme="teal" onClick={takeFromEscrow}>
-          Take from Escrow
+        <Button colorScheme="teal" onClick={makeEscrow}>
+          Make Escrow
         </Button>
       </HStack>
     </Box>
   );
 };
 
-export default TakeFromEscrow;
+export default MakeEscrow;
