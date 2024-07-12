@@ -223,11 +223,12 @@ export default async function Home() {
     >
       <VStack>
         <Text>
-          Infuse any NFT with carbon credits to tranform it in a eco-friendly
-          version.
+          The Escrow component is designed to facilitate secure and transparent
+          transactions between parties on the Solana blockchain. It allows users
+          to deposit tokens into a secure vault, ensuring that both the buyer
+          and seller fulfill their obligations before the assets are released
         </Text>
         <Spacer />
-        <Text>Search NFTs by collection or by wallet address.</Text>
         <Spacer />
         <Input />
         {/* <Text>Tx List:{txs.length}</Text>
