@@ -8,7 +8,7 @@ import {
   Text,
   VisuallyHidden,
 } from '@chakra-ui/react';
-import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
+import { FaTwitter } from 'react-icons/fa';
 import { ReactNode } from 'react';
 
 const SocialButton = ({
@@ -64,11 +64,11 @@ export default function SmallWithSocial() {
       >
         <Text>© 2023 Escrow. All rights reserved</Text>
         <Stack direction={'row'} spacing={6}>
-          <SocialButton label={'Twitter'} href={'https://twitter.com/0xTwoya'}>
+          <SocialButton
+            label={'Twitter'}
+            href={'https://twitter.com/truongnguyenptn'}
+          >
             <FaTwitter />
-          </SocialButton>
-          <SocialButton label={'Discord'} href={'https://discord.gg/B3ASTXdU'}>
-            <FaDiscord />
           </SocialButton>
         </Stack>
       </Container>

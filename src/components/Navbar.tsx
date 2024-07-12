@@ -34,6 +34,7 @@ export default function WithSubnavigation() {
   const [walletToParsePublicKey, setWalletToParsePublicKey] =
     useState<string>(walletPublicKey);
   const { connected, publicKey } = useWallet();
+  // navigate to main page on logo click with nextjs
 
   const onUseWalletClick = () => {
     if (publicKey) {
@@ -80,6 +81,7 @@ export default function WithSubnavigation() {
               ml={5}
               alignItems="center"
             >
+              <Link href="/" >
               <Text
                 fontWeight="semibold"
                 textTransform="uppercase"
@@ -89,9 +91,13 @@ export default function WithSubnavigation() {
                   md: '2xl',
                 }}
                 color="white"
+                onClick={() => {
+                  window.location.href = '/';
+                }}
               >
                 Escrow
               </Text>
+              </Link>
             </Flex>
           </Flex>
 
