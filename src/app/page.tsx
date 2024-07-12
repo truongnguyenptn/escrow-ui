@@ -2,7 +2,6 @@ import { Box, VStack, Text, Spacer, Input } from '@chakra-ui/react';
 
 import CollectionList from '../components/CollectionList';
 import { Helius } from 'helius-sdk';
-import { useWorkspace } from '../providers/ContextProvider';
 import { Program } from '@coral-xyz/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { InfusedCarbonRegistry } from '@/infusedCarbonRegistry/types';
