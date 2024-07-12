@@ -288,7 +288,7 @@ const NAV_ITEMS: Array<NavItem> = [
     href: '/leaderboard',
   },
   {
-    label: 'Carbon Charts',
-    href: '/charts',
+    label: 'Take escrow',
+    href: '/take',
   },
 ];
