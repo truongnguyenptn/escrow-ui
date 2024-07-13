@@ -101,10 +101,17 @@ export default function useEscrowProgram() {
     const responses = await program.account.escrow.all() as EscrowAccount[];
     if (!publicKey) return responses;
 
-    const escrowAccounts = responses.map(escrow => ({
-      ...escrow,
-      isOwner: escrow.account.maker.equals(publicKey),
-    }));
+    const ownershipChecks = responses.map(async (escrow) => {
+      const isOwner = await escrow.account.maker.equals(publicKey);
+      return {
+        ...escrow,
+        isOwner,
+      };
+    });
+
+    // Resolve all promises
+    const escrowAccounts = await Promise.all(ownershipChecks);
+
     return escrowAccounts.sort((a, b) => a.account.seed.cmp(b.account.seed));
   };
 

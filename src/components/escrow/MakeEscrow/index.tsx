@@ -19,24 +19,19 @@ const CreateEscrowButton = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <Box>
+    <Box> 
       <Button onClick={onOpen} colorScheme="teal">
         Create New Escrow
       </Button>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent p={6}>
           <ModalHeader>Create a New Escrow</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <MakeEscrow />
+            <MakeEscrow onFinished={onClose} />
           </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="teal" mr={3} onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
         </ModalContent>
       </Modal>
     </Box>

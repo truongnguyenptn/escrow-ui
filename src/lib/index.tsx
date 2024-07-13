@@ -20,7 +20,7 @@ export function trimText(str = '', len = 4) {
 
 const RPC_PROVIDER_URL = 'https://api.devnet.solana.com';
 
-export async function splBalances(
+export async function getSplBalances(
   address: string,
   tokenMintAddresses?: string[]
 ): Promise<TokenBalanceResponse> {

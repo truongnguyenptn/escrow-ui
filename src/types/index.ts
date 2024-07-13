@@ -1,6 +1,7 @@
 export * from './anchor-escrow';
 import { PublicKey } from '@solana/web3.js';
 import { BN } from '@coral-xyz/anchor';
+
 export interface EscrowAccount {
   publicKey: PublicKey;
   account: {
@@ -19,6 +20,7 @@ export interface EscrowAccount {
     seed: BN;
     bump: number;
   };
+  isOwner: boolean;
 }
 
 export interface TokenBalance {

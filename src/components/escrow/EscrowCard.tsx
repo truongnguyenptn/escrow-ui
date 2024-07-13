@@ -1,8 +1,6 @@
 'use client';
 
 import React from 'react';
-import { BN, ProgramAccount } from '@coral-xyz/anchor';
-import { PublicKey } from '@solana/web3.js';
 import {
   Box,
   Flex,
@@ -19,24 +17,15 @@ import {
   CornerDownRight,
   Handshake,
 } from 'lucide-react';
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import TokenAmount from '../TokenAmount';
 import TakeEscrow from './TakeEscrow';
 import ExplorerLink from '../ExplorerLink';
 import { trimText } from '@/lib';
+import { EscrowAccount } from '@/types';
 
 type Props = {
-  data: ProgramAccount<{
-    seed: BN;
-    maker: PublicKey;
-    mintA: PublicKey;
-    mintB: PublicKey;
-    receive: BN;
-    bump: number;
-  }>;
+  data: EscrowAccount;
 };
-
-const tokenProgram = TOKEN_PROGRAM_ID;
 
 const EscrowCard = ({ data }: Props) => {
   return (
@@ -48,6 +37,11 @@ const EscrowCard = ({ data }: Props) => {
       cursor="pointer"
       _hover={{ borderColor: 'teal.500' }}
     >
+      {data.isOwner && (
+        <Text color="green.500" fontWeight="bold" mb={2}>
+          You are the owner of this escrow
+        </Text>
+      )}
       <Flex direction="column" gap={4}>
         <Flex align="center" justifyContent="center" mb={4}>
           <Icon as={Handshake} mr={2} />
@@ -83,7 +77,7 @@ const EscrowCard = ({ data }: Props) => {
             <Text>From Token(A):</Text>
           </Flex>
           <ExplorerLink type="address" value={data.account.mintA.toString()}>
-            <Text color="teal.500" fontSize="sm">
+            <Text color="purple.600" fontSize="sm">
               {trimText(data.account.mintA.toString(), 8)}
             </Text>
           </ExplorerLink>
@@ -95,7 +89,7 @@ const EscrowCard = ({ data }: Props) => {
             <Text>To Token(B):</Text>
           </Flex>
           <ExplorerLink type="address" value={data.account.mintB.toString()}>
-            <Text color="teal.500" fontSize="sm">
+            <Text color="orange.600" fontSize="sm">
               {trimText(data.account.mintB.toString(), 8)}
             </Text>
           </ExplorerLink>

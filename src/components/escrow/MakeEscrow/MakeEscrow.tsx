@@ -7,18 +7,22 @@ import {
   Input,
   FormControl,
   FormLabel,
-  VStack,
   Select,
   useToast,
+  HStack,
+  VStack,
 } from '@chakra-ui/react';
 import { TokenBalance } from '@/types';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import useEscrowProgram from '@/hooks/useEscrowProgram';
-import { splBalances } from '@/lib';
+import { getSplBalances } from '@/lib';
 
-const MakeEscrow = () => {
+type Props = {
+  onFinished: () => void;
+};
+const MakeEscrow = ({ onFinished }: Props) => {
   const [tokenAccounts, setTokenAccounts] = useState<TokenBalance[]>([]);
   const [initialValues, setInitialValues] = useState({
     tokenADeposit: 0,
@@ -42,7 +46,7 @@ const MakeEscrow = () => {
     if (!wallet.publicKey) return;
 
     try {
-      const res = await splBalances(wallet.publicKey.toString());
+      const res = await getSplBalances(wallet.publicKey.toString());
       const tokenAccountsArray = res.onchainTokens.map(
         ({ pubkey, balance, mint }) => ({
           pubkey,
@@ -53,15 +57,18 @@ const MakeEscrow = () => {
 
       setTokenAccounts(tokenAccountsArray);
 
-      setInitialValues((prevValues) => ({
-        ...prevValues,
-        mintA: tokenAccountsArray[0]?.mint || '',
-        mintB: tokenAccountsArray[1]?.mint || '',
-      }));
+      setInitialValues({
+        tokenADeposit: 0,
+        tokenBReceive: 0,
+        mintA: tokenAccountsArray.length > 0 ? tokenAccountsArray[0].mint : '',
+        mintB: tokenAccountsArray.length > 1 ? tokenAccountsArray[1].mint : '',
+      });
+
     } catch (error) {
       console.error('Error fetching token accounts:', error);
     }
   };
+
 
   const validationSchema = Yup.object({
     tokenADeposit: Yup.number()
@@ -104,12 +111,21 @@ const MakeEscrow = () => {
         duration: 5000,
         isClosable: true,
       });
+    } finally {
+      setInitialValues({
+        tokenADeposit: 0,
+        tokenBReceive: 0,
+        mintA: '',
+        mintB: '',
+      });
+      onFinished();
     }
   };
 
   return (
     <Box>
       <Formik
+        enableReinitialize
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={(values, actions) => {
@@ -174,14 +190,24 @@ const MakeEscrow = () => {
                 />
               </FormControl>
             </VStack>
-            <Button
-              colorScheme="teal"
-              type="submit"
-              isLoading={isSubmitting}
-              mt={4}
-            >
-              Create Escrow
-            </Button>
+            <HStack justify="space-between" mt={4}>
+              <Button
+                mt={4}
+                colorScheme="gray"
+                type="reset"
+                onClick={() => resetForm()}
+              >
+                Reset
+              </Button>
+              <Button
+                colorScheme="teal"
+                type="submit"
+                isLoading={isSubmitting}
+                mt={4}
+              >
+                Create Escrow
+              </Button>
+            </HStack>
           </Form>
         )}
       </Formik>
