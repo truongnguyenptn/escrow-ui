@@ -6,6 +6,9 @@ const nextConfig = {
         NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
         NEXT_PUBLIC_RPC_URL: process.env.NEXT_PUBLIC_RPC_URL
     },
+    // experimental: {
+    //     missingSuspenseWithCSRBailout: false,
+    // },
 };
 
 module.exports = nextConfig;
