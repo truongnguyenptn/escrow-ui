@@ -3,16 +3,18 @@ import { PublicKey } from '@solana/web3.js';
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import escrow from '../idl/anchor_escrow.json';
 import {
-  AnchorWallet,
   ConnectionContextState,
+  Wallet,
+  WalletContextState,
 } from '@solana/wallet-adapter-react';
 import { AnchorEscrow } from "@/types";
 
 export function getProgramInstance(
   connection: ConnectionContextState,
-  wallet?: AnchorWallet
+  wallet?: WalletContextState
 ): Program<AnchorEscrow> {
-  if (!wallet?.publicKey) throw new WalletNotConnectedError();
+  console.log(wallet)
+  if (!wallet) throw new WalletNotConnectedError();
 
   const provider = new AnchorProvider(
     connection.connection,
@@ -32,7 +34,6 @@ export function getProgramInstance(
     escrow as AnchorEscrow,
     provider
   );
-
 
   return program;
 }
