@@ -11,10 +11,9 @@ import {
   HStack,
   Select,
 } from '@chakra-ui/react';
-import { Program } from '@coral-xyz/anchor';
-import { AnchorEscrow, TokenBalance } from '@/types';
+import { TokenBalance } from '@/types';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Formik, Form, Field, useFormikContext } from 'formik';
+import { Formik, Form, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 import useEscrowProgram from '@/hooks/useEscrowProgram';
 import { splBalances } from '@/lib';
@@ -26,7 +25,7 @@ const MakeEscrow = () => {
   const wallet = useWallet();
 
   useEffect(() => {
-    if (wallet && wallet.connected) {
+    if (wallet.connected) {
       fetchTokenAccounts();
     }
   }, [connection, wallet]);
@@ -70,12 +69,6 @@ const MakeEscrow = () => {
     mintB: Yup.string().required('Required'),
   });
 
-  const handleReset = () => {
-    // Reset form values using Formik context
-    const { resetForm } = useFormikContext();
-    resetForm();
-  };
-
   const makeEscrow = async (values: {
     escrowSeed?: string;
     tokenADeposit: number;
@@ -85,6 +78,7 @@ const MakeEscrow = () => {
   }) => {
     try {
       const { tokenADeposit, tokenBReceive, mintA, mintB } = values;
+      console.log('ok');
       await make({
         mint_a: mintA,
         mint_b: mintB,
@@ -124,14 +118,6 @@ const MakeEscrow = () => {
         }) => (
           <Form onSubmit={handleSubmit}>
             <VStack spacing={4} align="start">
-              <FormControl>
-                <FormLabel>Escrow Seed</FormLabel>
-                <Input
-                  name="escrowSeed"
-                  value={values.escrowSeed}
-                  onChange={handleChange}
-                />
-              </FormControl>
               <FormControl>
                 <FormLabel>Token A Deposit</FormLabel>
                 <Input
@@ -183,7 +169,9 @@ const MakeEscrow = () => {
               <Button
                 colorScheme="teal"
                 type="reset"
-                onClick={() => handleReset()}
+                onClick={() => {
+                  resetForm();
+                }}
               >
                 Reset
               </Button>

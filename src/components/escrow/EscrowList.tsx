@@ -2,9 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Heading, SimpleGrid } from '@chakra-ui/react';
 import Card from './Card';
-import SkeletonWrapper from '../SkeletonWrapper';
 import useEscrowProgram from '@/hooks/useEscrowProgram';
-import { Skeleton, SkeletonCircle, SkeletonText } from '@chakra-ui/react';
+import { Skeleton,  } from '@chakra-ui/react';
 import { EscrowAccount } from '@/types';
 const Escrows = () => {
   const { getEscrowAccounts } = useEscrowProgram();
@@ -16,6 +15,7 @@ const Escrows = () => {
       setIsLoading(true);
       try {
         const accounts = await getEscrowAccounts();
+        console.log(accounts);
         setEscrowAccounts(accounts);
       } catch (error) {
         console.error('Error fetching escrow accounts:', error);
@@ -39,13 +39,13 @@ const Escrows = () => {
 
   return (
     <Skeleton isLoaded={!isLoading}>
-      {/* <SkeletonWrapper isLoading={isLoading}> */}
       <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} my={10}>
         {escrowAccounts.map((escrow) => (
-          <Card key={escrow.publicKey.toString()} data={escrow} />
+          <Skeleton key={escrow.publicKey.toString()} isLoaded={!isLoading}>
+            <Card key={escrow.publicKey.toString()} data={escrow} />
+          </Skeleton>
         ))}
       </SimpleGrid>
-      {/* </SkeletonWrapper> */}
     </Skeleton>
   );
 };

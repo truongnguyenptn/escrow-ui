@@ -59,8 +59,8 @@ export async function splBalances(
   } catch (error) {
     console.error('Error fetching Solana balances:', error);
     return {
-      inAppPositions: [],
-      onchainPositions: [],
+      inAppTokens: [],
+      onchainTokens: [],
     };
   }
 }

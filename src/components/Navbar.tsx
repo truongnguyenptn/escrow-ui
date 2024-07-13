@@ -31,17 +31,6 @@ const walletPublicKey = '3EqUrFrjgABCWAnqMYjZ36GcktiwDtFdkNYwY6C6cDzy';
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
-  const [walletToParsePublicKey, setWalletToParsePublicKey] =
-    useState<string>(walletPublicKey);
-  const { connected, publicKey } = useWallet();
-  // navigate to main page on logo click with nextjs
-
-  const onUseWalletClick = () => {
-    if (publicKey) {
-      setWalletToParsePublicKey(publicKey?.toBase58());
-    }
-  };
-
   return (
     <Box>
       <Flex
@@ -110,15 +99,8 @@ export default function WithSubnavigation() {
           </Flex>
         </Flex>
         <Flex gap="2">
-          {/* {!connected && (
-            <WalletMultiButton className="wallet-adapter-button-trigger" />
-          )} */}
-          <ConnectButton onUseWalletClick={onUseWalletClick} />
-          {connected && <DisconnectButton />}
+          <ConnectButton />
         </Flex>
-        {/* <Flex flex={{ base: 1, md: 0 }} justify={'flex-end'} direction={'row'}>
-          <Spacer />
-        </Flex> */}
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>

@@ -62,7 +62,7 @@ export default function SmallWithSocial() {
         justify={{ base: 'center', md: 'space-between' }}
         align={{ base: 'center', md: 'center' }}
       >
-        <Text>© 2023 Escrow. All rights reserved</Text>
+        <Text>© 2024 Solana Talent Olympics Escrow. All rights reserved</Text>
         <Stack direction={'row'} spacing={6}>
           <SocialButton
             label={'Twitter'}

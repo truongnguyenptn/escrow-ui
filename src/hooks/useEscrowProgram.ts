@@ -9,7 +9,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import escrowIDL from '../idl/anchor_escrow.json';
-import { AnchorEscrow } from '@/types';
+import { AnchorEscrow, EscrowAccount } from '@/types';
 
 export default function useEscrowProgram() {
   const provider = useAnchorProvider();
@@ -102,7 +102,7 @@ export default function useEscrowProgram() {
   };
 
   const getEscrowAccounts = async () => {
-    const responses = await program.account.escrow.all();
+    const responses = await program.account.escrow.all() as EscrowAccount[];
     return responses.sort((a, b) => a.account.seed.cmp(b.account.seed));
   };
 

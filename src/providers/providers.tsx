@@ -76,7 +76,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <ChakraProvider theme={theme}>
         <ColorModeScript initialColorMode="dark" />
         <ConnectionProvider endpoint={endpoint}>
-          <WalletProvider wallets={wallets}>
+          <WalletProvider wallets={wallets} autoConnect>
             <Fonts />
             <WalletModalProvider>{children}</WalletModalProvider>
           </WalletProvider>
