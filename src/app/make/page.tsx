@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -10,37 +11,32 @@ import {
   HStack,
   Select,
 } from '@chakra-ui/react';
-import { getProgramInstance } from '@/escrow/program'; // Assuming this file contains getProgramInstance function
-import { BN, Program } from '@coral-xyz/anchor';
-import { AnchorEscrow } from '@/types';
-import { PublicKey } from '@solana/web3.js';
+import { Program } from '@coral-xyz/anchor';
+import { AnchorEscrow, TokenBalance } from '@/types';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { logSignature, Position, splBalances } from '@/lib';
-import {
-  TOKEN_PROGRAM_ID,
-  getAssociatedTokenAddressSync,
-  getOrCreateAssociatedTokenAccount,
-} from '@solana/spl-token';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, useFormikContext } from 'formik';
 import * as Yup from 'yup';
-import { randomBytes } from 'crypto';
-import useAnchorProvider from '@/hooks/useAnchorProvider';
 import useEscrowProgram from '@/hooks/useEscrowProgram';
+import { splBalances } from '@/lib';
 
 const MakeEscrow = () => {
-  const [tokenAccounts, setTokenAccounts] = useState<Position[]>([]);
-  const [program, setProgram] = useState<Program<AnchorEscrow>>();
+  const [tokenAccounts, setTokenAccounts] = useState<TokenBalance[]>([]);
+  const { makeNewEscrow: make } = useEscrowProgram();
   const connection = useConnection();
   const wallet = useWallet();
-  const seed = new BN(randomBytes(8));
-  const provider = useAnchorProvider();
-  const { makeNewEscrow: make } = useEscrowProgram();
+
+  useEffect(() => {
+    if (wallet && wallet.connected) {
+      fetchTokenAccounts();
+    }
+  }, [connection, wallet]);
+
   const fetchTokenAccounts = async () => {
     if (!wallet.publicKey) return;
 
     try {
       const res = await splBalances(wallet.publicKey.toString());
-      const tokenAccountsArray = res.onchainPositions.map(
+      const tokenAccountsArray = res.onchainTokens.map(
         ({ pubkey, balance, mint }) => ({
           pubkey,
           balance,
@@ -49,40 +45,10 @@ const MakeEscrow = () => {
       );
 
       setTokenAccounts(tokenAccountsArray);
-      console.log('tokenAccounts', tokenAccountsArray);
     } catch (error) {
       console.error('Error fetching token accounts:', error);
     }
   };
-
-  const makeEscrow = async (values) => {
-    if (!program || !wallet) return;
-    try {
-      const { tokenADeposit, tokenBReceive, mintA, mintB } = values;
-      make({
-        mint_a: mintA,
-        mint_b: mintB,
-        deposit: tokenADeposit,
-        deposit: tokenBReceive,
-      });
-      console.log('Escrow created successfully');
-    } catch (error) {
-      console.error('Error creating escrow:', error);
-    }
-  };
-
-  useEffect(() => {
-    const initializeProgram = async () => {
-      if (!wallet.publicKey) return;
-      const programInstance = getProgramInstance(connection, wallet);
-      setProgram(programInstance);
-    };
-
-    if (wallet && wallet.connected) {
-      initializeProgram();
-      fetchTokenAccounts();
-    }
-  }, [connection, wallet]);
 
   const initialValues = {
     escrowSeed: '',
@@ -104,6 +70,33 @@ const MakeEscrow = () => {
     mintB: Yup.string().required('Required'),
   });
 
+  const handleReset = () => {
+    // Reset form values using Formik context
+    const { resetForm } = useFormikContext();
+    resetForm();
+  };
+
+  const makeEscrow = async (values: {
+    escrowSeed?: string;
+    tokenADeposit: number;
+    tokenBReceive: number;
+    mintA: string;
+    mintB: string;
+  }) => {
+    try {
+      const { tokenADeposit, tokenBReceive, mintA, mintB } = values;
+      await make({
+        mint_a: mintA,
+        mint_b: mintB,
+        deposit: tokenADeposit,
+        receive: tokenBReceive,
+      });
+      console.log('Escrow created successfully');
+    } catch (error) {
+      console.error('Error creating escrow:', error);
+    }
+  };
+
   return (
     <Box
       maxW="7xl"
@@ -116,11 +109,9 @@ const MakeEscrow = () => {
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        enableReinitialize
         onSubmit={(values, actions) => {
           makeEscrow(values);
           actions.setSubmitting(false);
-          actions.resetForm();
         }}
       >
         {({
@@ -129,6 +120,7 @@ const MakeEscrow = () => {
           handleSubmit,
           isSubmitting,
           setFieldValue,
+          resetForm,
         }) => (
           <Form onSubmit={handleSubmit}>
             <VStack spacing={4} align="start">

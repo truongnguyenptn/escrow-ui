@@ -20,3 +20,14 @@ export interface EscrowAccount {
     bump: number;
   };
 }
+
+export interface TokenBalance {
+  pubkey: string;
+  balance: number;
+  mint: string;
+}
+
+export interface TokenBalanceResponse {
+  inAppTokens: TokenBalance[];
+  onchainTokens: TokenBalance[];
+}

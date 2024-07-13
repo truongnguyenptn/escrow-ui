@@ -3,6 +3,7 @@ import { twMerge } from 'tailwind-merge';
 
 import { Connection, PublicKey } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { TokenBalanceResponse } from '../types/index';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -17,28 +18,17 @@ export function trimText(str = '', len = 4) {
   return str;
 }
 
-export interface Position {
-  pubkey: string;
-  balance: number;
-  mint: string;
-}
-
-export interface PositionResponse {
-  inAppPositions: Position[];
-  onchainPositions: Position[];
-}
-
 const RPC_PROVIDER_URL = 'https://api.devnet.solana.com';
 
 export async function splBalances(
   address: string,
   tokenMintAddresses?: string[]
-): Promise<PositionResponse> {
+): Promise<TokenBalanceResponse> {
   const connection = new Connection(RPC_PROVIDER_URL);
   const publicKey = new PublicKey(address);
-  const res: PositionResponse = {
-    inAppPositions: [],
-    onchainPositions: [],
+  const res: TokenBalanceResponse = {
+    inAppTokens: [],
+    onchainTokens: [],
   };
 
   try {
@@ -51,19 +41,13 @@ export async function splBalances(
       const balance = accountData.tokenAmount.amount;
 
       if (tokenMintAddresses?.includes(mint)) {
-        res.inAppPositions.push({
+        res.inAppTokens.push({
           pubkey,
           balance: parseInt(balance),
           mint,
         });
       } else {
-        res.onchainPositions.push({
-          pubkey,
-          balance: parseInt(balance),
-          mint,
-        });
-
-        res.onchainPositions.push({
+        res.onchainTokens.push({
           pubkey,
           balance: parseInt(balance),
           mint,

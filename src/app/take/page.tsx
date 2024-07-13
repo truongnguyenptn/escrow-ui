@@ -16,7 +16,6 @@ import { PublicKey } from '@solana/web3.js';
 import { useConnection, useAnchorWallet } from '@solana/wallet-adapter-react';
 
 const TakeFromEscrow = () => {
-  const [escrowSeed, setEscrowSeed] = useState('');
   const [tokenAAmount, setTokenAAmount] = useState(0);
   const [tokenBAmount, setTokenBAmount] = useState(0);
   const [program, setProgram] = useState<Program<AnchorEscrow>>(); // State to hold the program instance
@@ -55,7 +54,6 @@ const TakeFromEscrow = () => {
   };
 
   const handleReset = () => {
-    setEscrowSeed('');
     setTokenAAmount(0);
     setTokenBAmount(0);
   };
@@ -79,13 +77,6 @@ const TakeFromEscrow = () => {
       py={{ base: '6', md: '8', lg: '10' }}
     >
       <VStack spacing={4} align="start">
-        <FormControl>
-          <FormLabel>Escrow Seed</FormLabel>
-          <Input
-            value={escrowSeed}
-            onChange={(e) => setEscrowSeed(e.target.value)}
-          />
-        </FormControl>
         <FormControl>
           <FormLabel>Token A Amount</FormLabel>
           <Input
