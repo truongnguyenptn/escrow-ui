@@ -1,9 +1,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Box, Heading, SimpleGrid } from '@chakra-ui/react';
+import { Box, Heading, SimpleGrid, Skeleton } from '@chakra-ui/react';
 import Card from './EscrowCard';
 import useEscrowProgram from '@/hooks/useEscrowProgram';
-import { Skeleton } from '@chakra-ui/react';
 import { EscrowAccount } from '@/types';
 const Escrows = () => {
   const { getEscrowAccounts } = useEscrowProgram();

@@ -9,7 +9,6 @@ import {
   FormLabel,
   VStack,
   Select,
-  Text,
   useToast,
 } from '@chakra-ui/react';
 import { TokenBalance } from '@/types';

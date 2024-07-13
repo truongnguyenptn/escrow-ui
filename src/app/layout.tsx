@@ -15,7 +15,8 @@ const inter = Inter({ subsets: ['latin'] });
 // Define metadata for the page
 export const metadata: Metadata = {
   title: 'The Escrow',
-  description: 'Infuse your NFT to be cool & sustainable-proof',
+  description:
+    'Facilitate secure transactions on the Solana blockchain with an Escrow component. We ensure both parties fulfill their obligations before assets are released.',
 };
 
 // Define the RootLayout component
@@ -26,10 +27,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        {/* Include Inter font */}
-        <link rel="stylesheet" href={inter} />
-      </head>
       <body>
         <Providers>
           {/* Render Navbar */}
