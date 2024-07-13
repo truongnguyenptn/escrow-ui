@@ -2,6 +2,7 @@
 
 import { Box, Text, VStack } from '@chakra-ui/react';
 import Escrows from '@/components/escrow/EscrowList';
+import React from 'react';
 
 const Home = () => {
   return (
