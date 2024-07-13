@@ -15,15 +15,17 @@ import { BN, Program } from '@coral-xyz/anchor';
 import { AnchorEscrow } from '@/types';
 import { PublicKey } from '@solana/web3.js';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { logSignature, Position, splBalances } from '@/lib';
 import {
   TOKEN_PROGRAM_ID,
-  getAssociatedTokenAddress,
-  TOKEN_2022_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+  getOrCreateAssociatedTokenAccount,
 } from '@solana/spl-token';
-import { logSignature, Position, splBalances } from '../utils';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { randomBytes } from 'crypto';
+import useAnchorProvider from '@/hooks/useAnchorProvider';
+import useEscrowProgram from '@/hooks/useEscrowProgram';
 
 const MakeEscrow = () => {
   const [tokenAccounts, setTokenAccounts] = useState<Position[]>([]);
@@ -31,7 +33,8 @@ const MakeEscrow = () => {
   const connection = useConnection();
   const wallet = useWallet();
   const seed = new BN(randomBytes(8));
-
+  const provider = useAnchorProvider();
+  const { makeNewEscrow: make } = useEscrowProgram();
   const fetchTokenAccounts = async () => {
     if (!wallet.publicKey) return;
 
@@ -54,77 +57,14 @@ const MakeEscrow = () => {
 
   const makeEscrow = async (values) => {
     if (!program || !wallet) return;
-
     try {
-      const { escrowSeed, tokenADeposit, tokenBReceive, mintA, mintB } = values;
-      const userAccountPublicKey = wallet.publicKey;
-      if (!userAccountPublicKey) return;
-
-      console.log({ mintA, mintB });
-
-      const mintAPublicKey = new PublicKey(mintA);
-      const mintBPublicKey = new PublicKey(mintB);
-
-      const makerAtaAPublicKey = await getAssociatedTokenAddress(
-        mintAPublicKey,
-        userAccountPublicKey
-      );
-      const makerAtaBPublicKey = await getAssociatedTokenAddress(
-        mintAPublicKey,
-        userAccountPublicKey
-      );
-      const vaultPublicKey = await getAssociatedTokenAddress(
-        mintAPublicKey,
-        userAccountPublicKey,
-        true
-      );
-
-      const escrow = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from('escrow'),
-          userAccountPublicKey.toBuffer(),
-          new BN(seed).toArrayLike(Buffer, 'le', 8),
-        ],
-        new PublicKey('2MNyegmPXMsSjpHbtW1xFiPYgMPDKZjy3R2zhZm7Q6Qk')
-      )[0];
-      console.log({
-        maker: userAccountPublicKey.toString(),
-        mintA: mintAPublicKey.toString(),
-        mintB: mintBPublicKey.toString(),
-        makerAtaA: makerAtaAPublicKey.toString(),
-        vault: vaultPublicKey.toString(),
-        escrow: escrow.toString(),
-        associatedTokenProgram: new PublicKey(
-          'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
-        ).toString(),
-        systemProgram: '11111111111111111111111111111111',
-        tokenProgram: TOKEN_2022_PROGRAM_ID.toString(),
+      const { tokenADeposit, tokenBReceive, mintA, mintB } = values;
+      make({
+        mint_a: mintA,
+        mint_b: mintB,
+        deposit: tokenADeposit,
+        deposit: tokenBReceive,
       });
-      await program.methods
-        .make(new BN(seed), new BN(tokenADeposit), new BN(tokenBReceive))
-        .accounts({
-          maker: userAccountPublicKey,
-          mintA: mintAPublicKey,
-          mintB: mintBPublicKey,
-          vault: vaultPublicKey,
-          makerAtaA: makerAtaAPublicKey,
-          associatedTokenProgram: new PublicKey(
-            'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
-          ),
-          tokenProgram: TOKEN_PROGRAM_ID,
-          // systemProgram: '11111111111111111111111111111111',
-          // taker: userAccountPublicKey,
-          // makerAtaB: makerAtaBPublicKey,
-          // takerAtaA: makerAtaAPublicKey,
-          // takerAtaB: vaultPublicKey,
-        })
-        .signers([])
-        .rpc({
-          skipPreflight: false,
-        })
-        .then(confirm)
-        .then(logSignature);
-
       console.log('Escrow created successfully');
     } catch (error) {
       console.error('Error creating escrow:', error);

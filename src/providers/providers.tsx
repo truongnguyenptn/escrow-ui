@@ -13,9 +13,7 @@ import {
   ConnectionProvider,
 } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import { clusterApiUrl } from '@solana/web3.js';
 import { useMemo } from 'react';
-import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
 import { extendTheme } from '@chakra-ui/react';
 import { Global } from '@emotion/react';
 
@@ -59,12 +57,11 @@ const theme = extendTheme({
   },
 });
 
-export function Providers({ children }: { children: React.ReactNode }) {
-  // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
-  const network = WalletAdapterNetwork.Devnet;
+const RPC_URL = String(process.env.NEXT_PUBLIC_RPC_URL);
 
+export function Providers({ children }: { children: React.ReactNode }) {
   // You can also provide a custom RPC endpoint.
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  const endpoint = useMemo(() => RPC_URL, []);
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
@@ -81,9 +78,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <ConnectionProvider endpoint={endpoint}>
           <WalletProvider wallets={wallets}>
             <Fonts />
-            <WalletModalProvider>
-          {children}
-            </WalletModalProvider>
+            <WalletModalProvider>{children}</WalletModalProvider>
           </WalletProvider>
         </ConnectionProvider>
       </ChakraProvider>

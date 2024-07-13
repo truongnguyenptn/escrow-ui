@@ -290,14 +290,6 @@ const NAV_ITEMS: Array<NavItem> = [
     href: '/',
   },
   {
-    label: 'Leaderboard',
-    href: '/leaderboard',
-  },
-  {
-    label: 'Take escrow',
-    href: '/take',
-  },
-  {
     label: 'Make escrow',
     href: '/make',
   },

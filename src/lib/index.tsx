@@ -1,5 +1,21 @@
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
 import { Connection, PublicKey } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+export function trimText(str = '', len = 4) {
+  if (str.length > 10) {
+    return (
+      str.substring(0, len) + '..' + str.substring(str.length - len, str.length)
+    );
+  }
+  return str;
+}
 
 export interface Position {
   pubkey: string;
@@ -14,7 +30,10 @@ export interface PositionResponse {
 
 const RPC_PROVIDER_URL = 'https://api.devnet.solana.com';
 
-export async function splBalances(address: string, tokenMintAddresses?: string[]): Promise<PositionResponse> {
+export async function splBalances(
+  address: string,
+  tokenMintAddresses?: string[]
+): Promise<PositionResponse> {
   const connection = new Connection(RPC_PROVIDER_URL);
   const publicKey = new PublicKey(address);
   const res: PositionResponse = {
@@ -37,7 +56,6 @@ export async function splBalances(address: string, tokenMintAddresses?: string[]
           balance: parseInt(balance),
           mint,
         });
-
       } else {
         res.onchainPositions.push({
           pubkey,
@@ -63,13 +81,20 @@ export async function splBalances(address: string, tokenMintAddresses?: string[]
   }
 }
 
-async function fetchTokenAccounts(connection: Connection, publicKey: PublicKey, maxAttempts = 3): Promise<any> {
+async function fetchTokenAccounts(
+  connection: Connection,
+  publicKey: PublicKey,
+  maxAttempts = 3
+): Promise<any> {
   let tryCount = 0;
   while (tryCount < maxAttempts) {
     try {
-      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
-        programId: TOKEN_PROGRAM_ID,
-      });
+      const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+        publicKey,
+        {
+          programId: TOKEN_PROGRAM_ID,
+        }
+      );
       return tokenAccounts;
     } catch (error) {
       console.error('Error fetching token accounts:', error);
