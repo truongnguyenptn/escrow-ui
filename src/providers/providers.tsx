@@ -2,7 +2,7 @@
 'use client';
 
 import { CacheProvider } from '@chakra-ui/next-js';
-import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
+import { ChakraProvider, ColorModeScript, extendTheme } from '@chakra-ui/react';
 import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
@@ -14,7 +14,6 @@ import {
 } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { useMemo } from 'react';
-import { extendTheme } from '@chakra-ui/react';
 import { Global } from '@emotion/react';
 
 const Fonts = () => (

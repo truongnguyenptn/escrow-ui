@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { BN, ProgramAccount } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
