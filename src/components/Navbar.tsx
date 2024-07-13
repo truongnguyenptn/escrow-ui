@@ -21,11 +21,7 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useState } from 'react';
 import ConnectButton from './ConnectButton';
-import DisconnectButton from './DisconnectButton';
-require('@solana/wallet-adapter-react-ui/styles.css');
 
 const walletPublicKey = '3EqUrFrjgABCWAnqMYjZ36GcktiwDtFdkNYwY6C6cDzy';
 

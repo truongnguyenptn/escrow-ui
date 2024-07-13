@@ -51,7 +51,7 @@ const TakeEscrow = ({ receive, escrow }: Props) => {
         isClosable: true,
       });
     } finally {
-      onClose;
+      onClose();
     }
   };
 

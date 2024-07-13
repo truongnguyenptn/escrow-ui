@@ -1,4 +1,4 @@
-export * from './anchor_escrow';
+export * from './anchor-escrow';
 import { PublicKey } from '@solana/web3.js';
 import { BN } from '@coral-xyz/anchor';
 export interface EscrowAccount {

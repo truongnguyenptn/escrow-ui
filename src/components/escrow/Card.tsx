@@ -21,7 +21,6 @@ import {
   getAssociatedTokenAddressSync,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
-// import useTokenBalance from '@/hooks/useTokenBalance';
 import TokenAmount from '../TokenAmount';
 import TakeEscrow from './button/TakeEscrow';
 import ExplorerLink from '../ExplorerLink';
@@ -40,19 +39,7 @@ type Props = {
 
 const tokenProgram = TOKEN_PROGRAM_ID;
 
-const EscrowCard: React.FC<Props> = ({ data }) => {
-  const vaultAccount = useMemo(() => {
-    return getAssociatedTokenAddressSync(
-      data.account.mintA,
-      data.publicKey,
-      true,
-      tokenProgram
-    );
-  }, [data.account.mintA, data.publicKey]);
-
-  // const { data: tokenBalance } = useTokenBalance(vaultAccount);
-  // console.log(tokenBalance);
-
+const EscrowCard = ({ data }: Props) => {
   return (
     <Box
       p={5}
@@ -63,17 +50,16 @@ const EscrowCard: React.FC<Props> = ({ data }) => {
       _hover={{ borderColor: 'teal.500' }}
     >
       <Flex direction="column" gap={4}>
-        <Flex align="center" mb={4}>
+        <Flex align="center" justifyContent="center" mb={4}>
           <Icon as={Handshake} mr={2} />
-          <Heading size="md">Escrow Details</Heading>
+          <Heading size="md">Escrow</Heading>
         </Flex>
-        <Text>
-          Escrow ID:{' '}
+        <Text textAlign="center">
+          Seed:{' '}
           <Text as="span" color="teal.500" ml={2}>
             {trimText(data.account.seed.toString())}
           </Text>
         </Text>
-
         <Divider my={4} />
 
         <Flex justify="space-between" align="center" mb={4}>
