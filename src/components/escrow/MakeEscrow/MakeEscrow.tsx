@@ -8,21 +8,30 @@ import {
   FormControl,
   FormLabel,
   VStack,
-  HStack,
   Select,
+  Text,
+  useToast,
 } from '@chakra-ui/react';
 import { TokenBalance } from '@/types';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Formik, Form, useFormikContext } from 'formik';
+import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import useEscrowProgram from '@/hooks/useEscrowProgram';
 import { splBalances } from '@/lib';
 
 const MakeEscrow = () => {
   const [tokenAccounts, setTokenAccounts] = useState<TokenBalance[]>([]);
-  const { makeNewEscrow: make } = useEscrowProgram();
+  const [initialValues, setInitialValues] = useState({
+    tokenADeposit: 0,
+    tokenBReceive: 0,
+    mintA: '',
+    mintB: '',
+  });
+
+  const { makeNewEscrow } = useEscrowProgram();
   const connection = useConnection();
   const wallet = useWallet();
+  const toast = useToast();
 
   useEffect(() => {
     if (wallet.connected) {
@@ -44,21 +53,18 @@ const MakeEscrow = () => {
       );
 
       setTokenAccounts(tokenAccountsArray);
+
+      setInitialValues((prevValues) => ({
+        ...prevValues,
+        mintA: tokenAccountsArray[0]?.mint || '',
+        mintB: tokenAccountsArray[1]?.mint || '',
+      }));
     } catch (error) {
       console.error('Error fetching token accounts:', error);
     }
   };
 
-  const initialValues = {
-    escrowSeed: '',
-    tokenADeposit: 0,
-    tokenBReceive: 0,
-    mintA: '',
-    mintB: '',
-  };
-
   const validationSchema = Yup.object({
-    escrowSeed: Yup.string().required('Required'),
     tokenADeposit: Yup.number()
       .required('Required')
       .min(1, 'Must be greater than 0'),
@@ -70,7 +76,6 @@ const MakeEscrow = () => {
   });
 
   const makeEscrow = async (values: {
-    escrowSeed?: string;
     tokenADeposit: number;
     tokenBReceive: number;
     mintA: string;
@@ -78,28 +83,33 @@ const MakeEscrow = () => {
   }) => {
     try {
       const { tokenADeposit, tokenBReceive, mintA, mintB } = values;
-      console.log('ok');
-      await make({
+      await makeNewEscrow({
         mint_a: mintA,
         mint_b: mintB,
         deposit: tokenADeposit,
         receive: tokenBReceive,
       });
-      console.log('Escrow created successfully');
+      toast({
+        title: 'Success',
+        description: 'Escrow created successfully.',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
     } catch (error) {
       console.error('Error creating escrow:', error);
+      toast({
+        title: 'Error',
+        description: 'There was an error creating the escrow.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
   return (
-    <Box
-      maxW="7xl"
-      mx="auto"
-      minHeight="100vh"
-      marginTop={50}
-      px={{ base: '4', md: '8', lg: '10' }}
-      py={{ base: '6', md: '8', lg: '10' }}
-    >
+    <Box>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -119,25 +129,7 @@ const MakeEscrow = () => {
           <Form onSubmit={handleSubmit}>
             <VStack spacing={4} align="start">
               <FormControl>
-                <FormLabel>Token A Deposit</FormLabel>
-                <Input
-                  type="number"
-                  name="tokenADeposit"
-                  value={values.tokenADeposit}
-                  onChange={handleChange}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Token B Receive</FormLabel>
-                <Input
-                  type="number"
-                  name="tokenBReceive"
-                  value={values.tokenBReceive}
-                  onChange={handleChange}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Token A Mint</FormLabel>
+                <FormLabel>Deposit Token (Mint A)</FormLabel>
                 <Select
                   name="mintA"
                   value={values.mintA}
@@ -151,7 +143,16 @@ const MakeEscrow = () => {
                 </Select>
               </FormControl>
               <FormControl>
-                <FormLabel>Token B Mint</FormLabel>
+                <FormLabel>Amount to Deposit</FormLabel>
+                <Input
+                  type="number"
+                  name="tokenADeposit"
+                  value={values.tokenADeposit}
+                  onChange={handleChange}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Receive Token (Mint B)</FormLabel>
                 <Select
                   name="mintB"
                   value={values.mintB}
@@ -164,21 +165,24 @@ const MakeEscrow = () => {
                   ))}
                 </Select>
               </FormControl>
+              <FormControl>
+                <FormLabel>Amount to Receive</FormLabel>
+                <Input
+                  type="number"
+                  name="tokenBReceive"
+                  value={values.tokenBReceive}
+                  onChange={handleChange}
+                />
+              </FormControl>
             </VStack>
-            <HStack justify="space-between" mt={4}>
-              <Button
-                colorScheme="teal"
-                type="reset"
-                onClick={() => {
-                  resetForm();
-                }}
-              >
-                Reset
-              </Button>
-              <Button colorScheme="teal" type="submit" isLoading={isSubmitting}>
-                Make Escrow
-              </Button>
-            </HStack>
+            <Button
+              colorScheme="teal"
+              type="submit"
+              isLoading={isSubmitting}
+              mt={4}
+            >
+              Create Escrow
+            </Button>
           </Form>
         )}
       </Formik>

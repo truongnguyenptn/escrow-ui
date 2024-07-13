@@ -22,6 +22,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import ConnectButton from './ConnectButton';
+import CreateEscrowButton from './escrow/MakeEscrow';
 
 const walletPublicKey = '3EqUrFrjgABCWAnqMYjZ36GcktiwDtFdkNYwY6C6cDzy';
 
@@ -151,6 +152,7 @@ const DesktopNav = () => {
           </Popover>
         </Box>
       ))}
+      <CreateEscrowButton />
     </Stack>
   );
 };
@@ -266,9 +268,5 @@ const NAV_ITEMS: Array<NavItem> = [
   {
     label: 'Collections',
     href: '/',
-  },
-  {
-    label: 'Make escrow',
-    href: '/make',
   },
 ];

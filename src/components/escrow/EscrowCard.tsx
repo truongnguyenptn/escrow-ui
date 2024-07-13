@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { BN, ProgramAccount } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 import {
@@ -17,12 +17,9 @@ import {
   CornerDownRight,
   Handshake,
 } from 'lucide-react';
-import {
-  getAssociatedTokenAddressSync,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import TokenAmount from '../TokenAmount';
-import TakeEscrow from './button/TakeEscrow';
+import TakeEscrow from './TakeEscrow';
 import ExplorerLink from '../ExplorerLink';
 import { trimText } from '@/lib';
 
@@ -81,7 +78,7 @@ const EscrowCard = ({ data }: Props) => {
         <Flex justify="space-between" align="center" mb={4}>
           <Flex align="center">
             <Icon as={CornerDownRight} mr={2} />
-            <Text>From Token (A):</Text>
+            <Text>From Token(A):</Text>
           </Flex>
           <ExplorerLink type="address" value={data.account.mintA.toString()}>
             <Text color="teal.500" fontSize="sm">
@@ -93,7 +90,7 @@ const EscrowCard = ({ data }: Props) => {
         <Flex justify="space-between" align="center" mb={4}>
           <Flex align="center">
             <Icon as={CornerUpRight} mr={2} />
-            <Text>To Token (B):</Text>
+            <Text>To Token(B):</Text>
           </Flex>
           <ExplorerLink type="address" value={data.account.mintB.toString()}>
             <Text color="teal.500" fontSize="sm">
@@ -101,19 +98,34 @@ const EscrowCard = ({ data }: Props) => {
             </Text>
           </ExplorerLink>
         </Flex>
-
         <Flex justify="space-between" align="center" mb={4}>
           <Flex align="center">
             <Icon as={Coins} mr={2} />
-            <Text>Maker will receive:</Text>
+            <Text>You will send:</Text>
           </Flex>
           <Flex align="center" color="teal.500" fontSize="sm">
             <TokenAmount
               amount={data.account.receive.toString()}
               decimals={9}
             />
-            <Text fontWeight="bold" ml={2} color="yellow.500">
+            <Text fontWeight="bold" ml={2} color="purple.600">
               B token
+            </Text>
+          </Flex>
+        </Flex>
+
+        <Flex justify="space-between" align="center" mb={4}>
+          <Flex align="center">
+            <Icon as={Coins} mr={2} />
+            <Text>You will receive:</Text>
+          </Flex>
+          <Flex align="center" color="teal.500" fontSize="sm">
+            <TokenAmount
+              amount={data.account.receive.toString()}
+              decimals={9}
+            />
+            <Text fontWeight="bold" ml={2} color="orange.600">
+              A token
             </Text>
           </Flex>
         </Flex>

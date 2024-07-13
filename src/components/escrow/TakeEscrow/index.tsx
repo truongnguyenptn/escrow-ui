@@ -37,13 +37,9 @@ const TakeEscrow = ({ receive, escrow }: Props) => {
 
     try {
       await takeAEscrow({ escrow });
-      toast({
-        title: 'Escrow taken',
-        status: 'success',
-        duration: 2000,
-        isClosable: true,
-      });
+   
     } catch (error) {
+      console.error(error);
       toast({
         title: 'Failed to take escrow',
         status: 'error',
@@ -52,6 +48,12 @@ const TakeEscrow = ({ receive, escrow }: Props) => {
       });
     } finally {
       onClose();
+      toast({
+        title: 'Escrow taken',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      });
     }
   };
 

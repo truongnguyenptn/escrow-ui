@@ -5,7 +5,6 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import {
   getAssociatedTokenAddressSync,
-  TOKEN_2022_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import escrowIDL from '../idl/anchor_escrow.json';
@@ -42,12 +41,9 @@ export default function useEscrowProgram() {
 
     return program.methods
       .refund()
-      .accountsPartial({
-        maker: escrowAccount.maker,
-        mintA: new PublicKey(escrowAccount.mintA),
+      .accounts({
         vault,
         makerAtaA,
-        escrow,
         tokenProgram,
       })
       .rpc();
@@ -161,7 +157,7 @@ export default function useEscrowProgram() {
       console.log("Transaction submitted:", txid);
 
       // Await transaction confirmation
-      const confirmation = await provider.connection.confirmTransaction(txid, "confirmed");
+      const confirmation = await provider.connection.confirmTransaction(txid, "processed");
       console.log("Transaction confirmed:", confirmation);
 
       return txid; // Return transaction ID if needed
