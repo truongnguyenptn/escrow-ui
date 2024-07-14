@@ -23,6 +23,7 @@ import {
 } from '@chakra-ui/react';
 import ConnectButton from './ConnectButton';
 import CreateEscrowButton from './escrow/MakeEscrow';
+import { usePathname } from 'next/navigation';
 
 const walletPublicKey = '3EqUrFrjgABCWAnqMYjZ36GcktiwDtFdkNYwY6C6cDzy';
 
@@ -109,7 +110,11 @@ export default function WithSubnavigation() {
 
 const DesktopNav = () => {
   const linkColor = 'gray.200';
+  const linkActiveColor = 'teal.500';
   const linkHoverColor = 'white';
+  const pathname = usePathname();
+  const isActive = (href: string) => href === pathname;
+  console.log(pathname);
   const popoverContentBgColor = 'gray.800';
 
   return (
@@ -122,12 +127,12 @@ const DesktopNav = () => {
                 p={2}
                 href={navItem.href ?? '#'}
                 fontSize={'lg'}
-                fontWeight={500}
-                color={linkColor}
+                color={isActive(navItem.href) ? linkActiveColor : linkColor}
                 _hover={{
                   textDecoration: 'none',
                   color: linkHoverColor,
                 }}
+                fontWeight={isActive(navItem.href) ? 800 : 200}
               >
                 {navItem.label}
               </Link>
@@ -199,11 +204,11 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
 
 const MobileNav = () => {
   return (
-    <Stack bg="gray.800" p={4} display={{ md: 'none' }}>
-      {NAV_ITEMS.map((navItem) => (
-        <MobileNavItem key={navItem.label} {...navItem} />
-      ))}
-    </Stack>
+    <Stack bg="gray.800" p={4} mt={{ base: '40px', md: 0 }} display={{ base: 'block', md: 'none' }}>
+    {NAV_ITEMS.map((navItem) => (
+      <MobileNavItem key={navItem.label} {...navItem} />
+    ))}
+  </Stack>
   );
 };
 
@@ -268,5 +273,9 @@ const NAV_ITEMS: Array<NavItem> = [
   {
     label: 'Collections',
     href: '/',
+  },
+  {
+    label: 'My Escrows',
+    href: '/my-escrow',
   },
 ];

@@ -149,6 +149,22 @@ export default function useEscrowProgram() {
     }
   });
 
+  const getMyEscrowAccounts = useQuery({
+    queryKey: ['getEscrowAccounts'],
+    queryFn: async () => {
+      const responses = await program.account.escrow.all() as EscrowAccount[];
+      if (!publicKey) return responses;
+
+      // Filter accounts where the maker matches the publicKey
+      const filteredAccounts = responses.filter(account => account.account.maker.equals(publicKey));
+
+      // Sort the filtered accounts if needed
+      const sortedAccounts = filteredAccounts.sort((a, b) => a.account.seed.cmp(b.account.seed));
+
+      return sortedAccounts;
+    }
+  });
+
   const makeNewEscrow = useMutation({
     mutationKey: ['makeNewEscrow'],
     mutationFn: async ({ mintA, mintB, deposit, receive }
@@ -224,6 +240,7 @@ export default function useEscrowProgram() {
     getEscrowAccounts,
     takeEscrow,
     refundEscrow,
-    getEscrowInfo
+    getEscrowInfo,
+    getMyEscrowAccounts
   };
 }

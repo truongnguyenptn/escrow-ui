@@ -1,8 +1,8 @@
 'use client';
 
 import { Box, Text, VStack } from '@chakra-ui/react';
-import { Escrows } from '@/components/escrow';
 import React from 'react';
+import { MyEscrows } from '@/components/escrow';
 
 const Home = () => {
   return (
@@ -16,12 +16,9 @@ const Home = () => {
     >
       <VStack align="center" spacing={8}>
         <Text textAlign="center" fontSize="xl">
-          Facilitate secure transactions on the Solana blockchain with the
-          Escrow service. <br />
-          We ensure both parties fulfill their obligations before assets are
-          released.
+          Your owned escrows
         </Text>
-        <Escrows />
+        <MyEscrows />
       </VStack>
     </Box>
   );

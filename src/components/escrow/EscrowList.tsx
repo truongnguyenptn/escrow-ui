@@ -1,18 +1,15 @@
-'use client';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Box, Heading, SimpleGrid, Skeleton } from '@chakra-ui/react';
 import Card from './EscrowCard';
-import useEscrowProgram from '@/hooks/useEscrowProgram';
 import { EscrowAccount } from '@/types';
-const Escrows = () => {
-  const { getEscrowAccounts } = useEscrowProgram();
-  const { data: escrowAccounts, isLoading } = getEscrowAccounts;
 
-  useEffect(() => {
-    getEscrowAccounts.refetch();
-  }, []);
+type Props = {
+  escrowAccounts?: EscrowAccount[];
+  isLoading: boolean;
+};
 
-  if (escrowAccounts?.length === 0 && !isLoading) {
+const EscrowList = ({ escrowAccounts, isLoading }: Props) => {
+  if (!isLoading && (!escrowAccounts || escrowAccounts.length === 0)) {
     return (
       <Box textAlign="center" my={10}>
         <Heading as="h2" size="xl" fontWeight="semibold">
@@ -35,4 +32,4 @@ const Escrows = () => {
   );
 };
 
-export default Escrows;
+export default EscrowList;
