@@ -36,10 +36,12 @@ type Props = {
   data: EscrowAccount;
 };
 
-const EscrowCard =  ({ data }: Props) => {
+const EscrowCard = async ({ data }: Props) => {
   const { publicKey } = useWallet();
   const { getEscrowInfo } = useEscrowProgram();
   const isOwner = publicKey && data.account.maker.equals(publicKey);
+  const info = await getEscrowInfo(data.publicKey);
+  console.log(info, data);
   return (
     <Box
       p={5}
@@ -98,7 +100,7 @@ const EscrowCard =  ({ data }: Props) => {
         <Flex justify="space-between" align="center" mb={4}>
           <Flex align="center">
             <Icon as={CornerDownRight} mr={2} />
-            <Text>From Token(A):</Text>
+            <Text>Exchange Token(A):</Text>
           </Flex>
           <ExplorerLink type="address" value={data.account.mintA.toString()}>
             <Text color="purple.600" fontSize="sm">

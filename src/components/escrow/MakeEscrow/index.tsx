@@ -11,8 +11,10 @@ import {
   ModalCloseButton,
   ModalBody,
   useDisclosure,
+  Text,
 } from '@chakra-ui/react';
 import MakeEscrow from './MakeEscrow'; // Ensure this import path is correct
+import { Link } from '@chakra-ui/next-js';
 
 const CreateEscrowButton = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -30,6 +32,16 @@ const CreateEscrowButton = () => {
           <ModalCloseButton />
           <ModalBody>
             <MakeEscrow onFinished={onClose} />
+            <Text mt={4} fontSize="sm" color="gray.500">
+              Do not have testnet tokens?{' '}
+              <Link
+                href="https://faucet.circle.com/"
+                color="teal.500"
+              >
+                Go to this faucet
+              </Link>
+              .
+            </Text>
           </ModalBody>
         </ModalContent>
       </Modal>
