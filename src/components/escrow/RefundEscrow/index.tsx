@@ -10,8 +10,8 @@ import {
   Button,
   useToast,
 } from '@chakra-ui/react';
-import { PublicKey } from '@solana/web3.js';
 import useEscrowProgram from '@/hooks/useEscrowProgram';
+import { PublicKey } from '@solana/web3.js';
 
 type Props = {
   escrow: PublicKey;
@@ -33,7 +33,7 @@ const RefundEscrowButton = ({ escrow }: Props) => {
     });
 
     try {
-      await refundEscrow({ escrow });
+      await refundEscrow.mutateAsync({ escrow });
       toast({
         title: 'Escrow successfully refunded',
         status: 'success',

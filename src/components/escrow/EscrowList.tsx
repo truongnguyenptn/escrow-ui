@@ -6,27 +6,13 @@ import useEscrowProgram from '@/hooks/useEscrowProgram';
 import { EscrowAccount } from '@/types';
 const Escrows = () => {
   const { getEscrowAccounts } = useEscrowProgram();
-  const [escrowAccounts, setEscrowAccounts] = useState<EscrowAccount[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  useEffect(() => {
-    const fetchEscrowAccounts = async () => {
-      setIsLoading(true);
-      try {
-        const accounts = await getEscrowAccounts();
-        console.log(accounts);
-        setEscrowAccounts(accounts);
-      } catch (error) {
-        console.error('Error fetching escrow accounts:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const { data: escrowAccounts, isLoading } = getEscrowAccounts;
 
-    fetchEscrowAccounts();
+  useEffect(() => {
+    getEscrowAccounts.refetch();
   }, []);
 
-  if (escrowAccounts.length === 0 && !isLoading) {
+  if (escrowAccounts?.length === 0 && !isLoading) {
     return (
       <Box textAlign="center" my={10}>
         <Heading as="h2" size="xl" fontWeight="semibold">
@@ -39,7 +25,7 @@ const Escrows = () => {
   return (
     <Skeleton isLoaded={!isLoading}>
       <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} my={10}>
-        {escrowAccounts.map((escrow) => (
+        {escrowAccounts?.map((escrow) => (
           <Skeleton key={escrow.publicKey.toString()} isLoaded={!isLoading}>
             <Card key={escrow.publicKey.toString()} data={escrow} />
           </Skeleton>

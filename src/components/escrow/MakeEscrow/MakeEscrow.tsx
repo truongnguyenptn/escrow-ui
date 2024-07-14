@@ -63,12 +63,10 @@ const MakeEscrow = ({ onFinished }: Props) => {
         mintA: tokenAccountsArray.length > 0 ? tokenAccountsArray[0].mint : '',
         mintB: tokenAccountsArray.length > 1 ? tokenAccountsArray[1].mint : '',
       });
-
     } catch (error) {
       console.error('Error fetching token accounts:', error);
     }
   };
-
 
   const validationSchema = Yup.object({
     tokenADeposit: Yup.number()
@@ -89,7 +87,7 @@ const MakeEscrow = ({ onFinished }: Props) => {
   }) => {
     try {
       const { tokenADeposit, tokenBReceive, mintA, mintB } = values;
-      await makeNewEscrow({
+      await makeNewEscrow.mutateAsync({
         mint_a: mintA,
         mint_b: mintB,
         deposit: tokenADeposit,

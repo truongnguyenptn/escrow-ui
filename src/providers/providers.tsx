@@ -15,6 +15,8 @@ import {
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { useMemo } from 'react';
 import { Global } from '@emotion/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+const queryClient = new QueryClient();
 
 const Fonts = () => (
   <Global
@@ -71,6 +73,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
+    <QueryClientProvider client={queryClient}>
     <CacheProvider>
       <ChakraProvider theme={theme}>
         <ColorModeScript initialColorMode="dark" />
@@ -82,5 +85,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
         </ConnectionProvider>
       </ChakraProvider>
     </CacheProvider>
+    </QueryClientProvider>
   );
 }

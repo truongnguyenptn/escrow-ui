@@ -2,185 +2,217 @@ import { BN, Program } from "@coral-xyz/anchor";
 import useAnchorProvider from "./useAnchorProvider";
 import { randomBytes } from "crypto";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Transaction } from "@solana/web3.js";
 import {
   getAssociatedTokenAddressSync,
   TOKEN_PROGRAM_ID,
-  TOKEN_2022_PROGRAM_ID
+  createAssociatedTokenAccountInstruction,
+  TOKEN_2022_PROGRAM_ID,
 } from "@solana/spl-token";
 import escrowIDL from '../idl/anchor_escrow.json';
 import { AnchorEscrow, EscrowAccount } from '@/types';
 import { isToken2022 } from "@/lib";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function useEscrowProgram() {
   const provider = useAnchorProvider();
   const { publicKey } = useWallet();
   const program = new Program<AnchorEscrow>(escrowIDL as AnchorEscrow, provider);
-  const tokenProgram = TOKEN_PROGRAM_ID; //TOKEN_2022_PROGRAM_ID;
+  const tokenProgram = TOKEN_PROGRAM_ID;
+  const queryClient = useQueryClient();
 
   const getEscrowInfo = async (escrow: PublicKey) => {
     return program.account.escrow.fetch(escrow);
   };
 
-  const refundEscrow = async (params: { escrow: PublicKey }) => {
-    if (!publicKey) return;
-    const { escrow } = params;
-    const escrowAccount = await getEscrowInfo(escrow);
+  const createAssociatedTokenAccountIfNotExists = async (mint: PublicKey, owner: PublicKey, payer: PublicKey) => {
+    const ata = getAssociatedTokenAddressSync(mint, owner, false, TOKEN_PROGRAM_ID);
+    const accountInfo = await provider.connection.getAccountInfo(ata);
+    if (!accountInfo) {
+      const transaction = new Transaction().add(
+        createAssociatedTokenAccountInstruction(
+          payer,
+          ata,
+          owner,
+          mint
+        )
+      );
+      await provider.sendAndConfirm(transaction, []);
+    }
+    return ata;
+  };
 
-    const makerAtaA = getAssociatedTokenAddressSync(
-      new PublicKey(escrowAccount.mintA),
-      escrowAccount.maker,
-      false,
-      tokenProgram
-    );
+  const refundEscrow = useMutation({
+    mutationKey: ['refundEscrow'],
+    mutationFn: async ({ escrow }: {
+      escrow: PublicKey
+    }) => {
+      if (!publicKey) return;
+      const escrowAccount = await getEscrowInfo(escrow);
 
-    const vault = getAssociatedTokenAddressSync(
-      new PublicKey(escrowAccount.mintA),
-      escrow,
-      true,
-      tokenProgram
-    );
+      const makerAtaA = getAssociatedTokenAddressSync(
+        new PublicKey(escrowAccount.mintA),
+        escrowAccount.maker,
+        false,
+        tokenProgram
+      );
 
-    return program.methods
-      .refund()
-      .accountsPartial({
-        mintA: new PublicKey(escrowAccount.mintA),
-        vault,
-        makerAtaA,
+      const vault = getAssociatedTokenAddressSync(
+        new PublicKey(escrowAccount.mintA),
         escrow,
-        tokenProgram,
-      })
-      .rpc();
-  };
+        true,
+        tokenProgram
+      );
 
-  const takeEscrow = async (params: { escrow: PublicKey }) => {
-    if (!publicKey) return;
-    const { escrow } = params;
-    const escrowAccount = await getEscrowInfo(escrow);
-    const tokenProgram = (await isToken2022(provider, escrowAccount.mintA))
-      ? TOKEN_2022_PROGRAM_ID
-      : TOKEN_PROGRAM_ID;
-
-    const [vault] = PublicKey.findProgramAddressSync(
-      [Buffer.from("vault"), escrow.toBuffer(), publicKey.toBuffer()],
-      program.programId
-    );
-
-    const makerAtaB = getAssociatedTokenAddressSync(
-      new PublicKey(escrowAccount.mintB),
-      escrowAccount.maker,
-      false,
-      tokenProgram
-    );
-
-    const takerAtaA = getAssociatedTokenAddressSync(
-      new PublicKey(escrowAccount.mintA),
-      publicKey,
-      false,
-      tokenProgram
-    );
-
-    const takerAtaB = getAssociatedTokenAddressSync(
-      new PublicKey(escrowAccount.mintB),
-      publicKey,
-      false,
-      tokenProgram
-    );
-
-    return program.methods
-      .take()
-      .accountsPartial({
-        maker: escrowAccount.maker,
-        taker: publicKey,
-        mintA: new PublicKey(escrowAccount.mintA),
-        mintB: new PublicKey(escrowAccount.mintB),
-        makerAtaB,
-        takerAtaA,
-        takerAtaB,
-        escrow,
-        tokenProgram,
-        vault,
-      })
-      .rpc();
-  };
-
-  const getEscrowAccounts = async () => {
-    const responses = await program.account.escrow.all() as EscrowAccount[];
-
-    if (!publicKey) return responses;
-
-    // Sort the escrow accounts based on seed value
-    return responses.sort((a, b) => a.account.seed.cmp(b.account.seed));
-  };
-
-  const makeNewEscrow = async (params: {
-    mint_a: string;
-    mint_b: string;
-    deposit: number;
-    receive: number;
-  }) => {
-    if (!publicKey) return;
-    const seed = new BN(randomBytes(8));
-    const { mint_a, mint_b, deposit, receive } = params;
-
-    const tokenProgram = (await isToken2022(provider, new PublicKey(mint_a)))
-      ? TOKEN_2022_PROGRAM_ID
-      : TOKEN_PROGRAM_ID;
-
-    const makerAtaA = getAssociatedTokenAddressSync(
-      new PublicKey(mint_a),
-      publicKey,
-      false,
-      tokenProgram
-    );
-
-    const [escrow] = PublicKey.findProgramAddressSync(
-      [
-        Buffer.from("escrow"),
-        publicKey.toBuffer(),
-        seed.toArrayLike(Buffer, "le", 8),
-      ],
-      program.programId
-    );
-
-    const vault = getAssociatedTokenAddressSync(
-      new PublicKey(mint_a),
-      escrow,
-      true,
-      tokenProgram
-    );
-
-    try {
-      // Check the balance of the maker's ATA before proceeding
-      const makerBalance = await provider.connection.getTokenAccountBalance(makerAtaA);
-      if (makerBalance?.value?.uiAmount && makerBalance?.value?.uiAmount < deposit) {
-        throw new Error("Insufficient funds in the maker's ATA");
-      }
-
-      const txid = await program.methods
-        .make(seed, new BN(deposit), new BN(receive))
-        .accounts({
-          maker: publicKey,
-          mintA: new PublicKey(mint_a),
-          mintB: new PublicKey(mint_b),
-          makerAtaA,
+      return program.methods
+        .refund()
+        .accountsPartial({
+          mintA: new PublicKey(escrowAccount.mintA),
           vault,
+          makerAtaA,
+          escrow,
           tokenProgram,
         })
         .rpc();
-
-      console.log("Transaction submitted:", txid);
-
-      // Await transaction confirmation
-      const confirmation = await provider.connection.confirmTransaction(txid, "processed");
-      console.log("Transaction confirmed:", confirmation);
-
-      return txid; // Return transaction ID if needed
-    } catch (error) {
-      console.error("Error creating escrow:", error);
-      throw error; // Rethrow the error for handling in the caller function
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['getEscrowAccounts'] });
     }
-  };
+  });
+
+  const takeEscrow = useMutation({
+    mutationKey: ['takeEscrow'],
+    mutationFn: async ({ escrow }: {
+      escrow: PublicKey
+    }) => {
+      if (!publicKey) return;
+      const escrowAccount = await getEscrowInfo(escrow);
+      const tokenProgram = (await isToken2022(provider, escrowAccount.mintA))
+        ? TOKEN_2022_PROGRAM_ID
+        : TOKEN_PROGRAM_ID;
+
+      const [vault] = PublicKey.findProgramAddressSync(
+        [Buffer.from("vault"), escrow.toBuffer(), publicKey.toBuffer()],
+        program.programId
+      );
+
+      const makerAtaB = getAssociatedTokenAddressSync(
+        new PublicKey(escrowAccount.mintB),
+        escrowAccount.maker,
+        false,
+        tokenProgram
+      );
+
+      const takerAtaA = await createAssociatedTokenAccountIfNotExists(
+        new PublicKey(escrowAccount.mintA),
+        publicKey,
+        publicKey
+      );
+
+      const takerAtaB = await createAssociatedTokenAccountIfNotExists(
+        new PublicKey(escrowAccount.mintB),
+        publicKey,
+        publicKey
+      );
+
+      return program.methods
+        .take()
+        .accountsPartial({
+          maker: escrowAccount.maker,
+          taker: publicKey,
+          mintA: new PublicKey(escrowAccount.mintA),
+          mintB: new PublicKey(escrowAccount.mintB),
+          makerAtaB,
+          takerAtaA,
+          takerAtaB,
+          escrow,
+          tokenProgram,
+          vault,
+        })
+        .rpc();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['getEscrowAccounts'] });
+    }
+  });
+
+  const getEscrowAccounts = useQuery({
+    queryKey: ['getEscrowAccounts'],
+    queryFn: async () => {
+      const responses = await program.account.escrow.all() as EscrowAccount[];
+      if (!publicKey) return responses;
+      return responses.sort((a, b) => a.account.seed.cmp(b.account.seed));
+    }
+  });
+
+  const makeNewEscrow = useMutation({
+    mutationKey: ['makeNewEscrow'],
+    mutationFn: async ({ mint_a, mint_b, deposit, receive }
+      : { mint_a: string, mint_b: string, deposit: number, receive: number }
+    ) => {
+      if (!publicKey) return;
+      const seed = new BN(randomBytes(8));
+
+      const tokenProgram = (await isToken2022(provider, new PublicKey(mint_a)))
+        ? TOKEN_2022_PROGRAM_ID
+        : TOKEN_PROGRAM_ID;
+
+      const makerAtaA = getAssociatedTokenAddressSync(
+        new PublicKey(mint_a),
+        publicKey,
+        false,
+        tokenProgram
+      );
+
+      const [escrow] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("escrow"),
+          publicKey.toBuffer(),
+          seed.toArrayLike(Buffer, "le", 8),
+        ],
+        program.programId
+      );
+
+      const vault = getAssociatedTokenAddressSync(
+        new PublicKey(mint_a),
+        escrow,
+        true,
+        tokenProgram
+      );
+
+      try {
+        const makerBalance = await provider.connection.getTokenAccountBalance(makerAtaA);
+        if (makerBalance?.value?.uiAmount && makerBalance?.value?.uiAmount < deposit) {
+          throw new Error("Insufficient funds in the maker's ATA");
+        }
+
+        const txid = await program.methods
+          .make(seed, new BN(deposit), new BN(receive))
+          .accounts({
+            maker: publicKey,
+            mintA: new PublicKey(mint_a),
+            mintB: new PublicKey(mint_b),
+            makerAtaA,
+            vault,
+            tokenProgram,
+          })
+          .rpc();
+
+        console.log("Transaction submitted:", txid);
+
+        const confirmation = await provider.connection.confirmTransaction(txid, "processed");
+        console.log("Transaction confirmed:", confirmation);
+
+        return txid;
+      } catch (error) {
+        console.error("Error creating escrow:", error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['getEscrowAccounts'] });
+    }
+  });
 
   return {
     program,
@@ -188,5 +220,6 @@ export default function useEscrowProgram() {
     getEscrowAccounts,
     takeEscrow,
     refundEscrow,
+    getEscrowInfo
   };
 }

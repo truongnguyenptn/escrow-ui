@@ -10,7 +10,6 @@ import {
   ModalHeader,
   ModalCloseButton,
   ModalBody,
-  ModalFooter,
   useDisclosure,
 } from '@chakra-ui/react';
 import MakeEscrow from './MakeEscrow'; // Ensure this import path is correct
@@ -19,7 +18,7 @@ const CreateEscrowButton = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <Box> 
+    <Box>
       <Button onClick={onOpen} colorScheme="teal">
         Create New Escrow
       </Button>

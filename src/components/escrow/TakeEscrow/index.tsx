@@ -36,7 +36,7 @@ const TakeEscrow = ({ receive, escrow }: Props) => {
     });
 
     try {
-      await takeEscrow({ escrow });
+      await takeEscrow.mutateAsync({ escrow });
       toast({
         title: 'Escrow taken',
         status: 'success',

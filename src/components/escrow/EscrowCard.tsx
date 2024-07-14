@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Flex,
@@ -30,6 +30,7 @@ import { trimText } from '@/lib';
 import { EscrowAccount } from '@/types';
 import { useWallet } from '@solana/wallet-adapter-react';
 import RefundEscrowButton from './RefundEscrow';
+import useEscrowProgram from '@/hooks/useEscrowProgram';
 
 type Props = {
   data: EscrowAccount;
@@ -37,7 +38,9 @@ type Props = {
 
 const EscrowCard = ({ data }: Props) => {
   const { publicKey } = useWallet();
+  const { getEscrowInfo } = useEscrowProgram();
   const isOwner = publicKey && data.account.maker.equals(publicKey);
+  console.log(data, getEscrowInfo(data.publicKey));
   return (
     <Box
       p={5}
@@ -122,10 +125,7 @@ const EscrowCard = ({ data }: Props) => {
             <Text>You will send:</Text>
           </Flex>
           <Flex align="center" color="teal.500" fontSize="sm">
-            <TokenAmount
-              amount={data.account.receive.toString()}
-              decimals={9}
-            />
+            <TokenAmount amount={data?.account?.receive} decimals={9} />
             <Text fontWeight="bold" ml={2} color="purple.600">
               B token
             </Text>
@@ -138,10 +138,7 @@ const EscrowCard = ({ data }: Props) => {
             <Text>You will receive:</Text>
           </Flex>
           <Flex align="center" color="teal.500" fontSize="sm">
-            <TokenAmount
-              amount={data.account.receive.toString()}
-              decimals={9}
-            />
+            <TokenAmount amount={data.account.receive.toString()} />
             <Text fontWeight="bold" ml={2} color="orange.600">
               A token
             </Text>
