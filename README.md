@@ -1,35 +1,49 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Escrow UI + Blink - Solana Talent Olympics
+
+Welcome to Escrow UI + Blink, a decentralized application built on the Solana blockchain. This project aims to facilitate secure transactions through escrow services, providing users with a seamless and efficient experience in managing and interacting with escrow accounts.
+
+## Introduction
+
+Visit the home page: [Escrow UI + Blink](https://olympic-escrow.vercel.app/)
+
+## Features
+
+### Collections Page
+
+- **Active Escrow List**: Displays a comprehensive list of active escrow accounts.
+- **Details View**: Users can view detailed information about each escrow, including parties involved and the terms of the escrow.
+
+### My Escrow Page
+
+- **Make a New Escrow**: Create new escrow accounts by specifying the terms and conditions.
+
+### Owner's Action
+
+- **Refund Escrow**: Authors can refund escrows if the conditions are met or the transaction is canceled.
+- **Manage Escrows**: Efficiently manage created escrows.
+
+### User Action
+
+- **Take Escrow**: Participate in existing escrows by accepting the terms and fulfilling the conditions.
 
 ## Getting Started
 
-First, run the development server:
+To get a local copy up and running follow these simple steps:
 
-```bash
+1. **Clone the repository**:
+   ```sh
+   git clone https://github.com/truongnguyenptn/escrow-ui
+   cd escrow-ui-blink
+
+2. **Install dependencies:
+
+```sh
+npm install
+Run the development server:
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+Open http://localhost:3000 in your browser to see the application.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-# escrow-ui
+## Technologies Used
+Next.js: React framework for server-rendered React applications.
+Solana Blockchain: Infrastructure for decentralized applications.
+Tailwind CSS: Utility-first CSS framework for styling.

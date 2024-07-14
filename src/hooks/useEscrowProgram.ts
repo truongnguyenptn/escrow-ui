@@ -25,22 +25,6 @@ export default function useEscrowProgram() {
     return program.account.escrow.fetch(escrow);
   };
 
-  const createAssociatedTokenAccountIfNotExists = async (mint: PublicKey, owner: PublicKey, payer: PublicKey) => {
-    const ata = getAssociatedTokenAddressSync(mint, owner, false, TOKEN_PROGRAM_ID);
-    const accountInfo = await provider.connection.getAccountInfo(ata);
-    if (!accountInfo) {
-      const transaction = new Transaction().add(
-        createAssociatedTokenAccountInstruction(
-          payer,
-          ata,
-          owner,
-          mint
-        )
-      );
-      await provider.sendAndConfirm(transaction, []);
-    }
-    return ata;
-  };
 
   const refundEscrow = useMutation({
     mutationKey: ['refundEscrow'],
@@ -152,16 +136,23 @@ export default function useEscrowProgram() {
   const getMyEscrowAccounts = useQuery({
     queryKey: ['getEscrowAccounts'],
     queryFn: async () => {
-      const responses = await program.account.escrow.all() as EscrowAccount[];
-      if (!publicKey) return responses;
+      if (!publicKey) {
+        return []; // Return empty array if publicKey is not defined
+      }
 
-      // Filter accounts where the maker matches the publicKey
-      const filteredAccounts = responses.filter(account => account.account.maker.equals(publicKey));
+      const filters = [
+        {
+          dataSize: 64, // Assuming account data size is 64 bytes
+          memcmp: {
+            offset: 32, // Assuming offset 32 is where `maker` PublicKey is located in your account data structure
+            bytes: publicKey.toBuffer(), // Replace publicKey with the actual PublicKey value
+          },
+        },
+      ];
 
-      // Sort the filtered accounts if needed
-      const sortedAccounts = filteredAccounts.sort((a, b) => a.account.seed.cmp(b.account.seed));
+      const responses = await program.account.escrow.all(filters) as EscrowAccount[];
+      return responses.sort((a, b) => a.account.seed.cmp(b.account.seed));
 
-      return sortedAccounts;
     }
   });
 
