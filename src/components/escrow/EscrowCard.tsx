@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Flex,
@@ -26,22 +26,37 @@ import {
 import TokenAmount from '../TokenAmount';
 import TakeEscrow from './TakeEscrow';
 import ExplorerLink from '../ExplorerLink';
-import { trimText } from '@/lib';
+import { getPdaTokenBalance, trimText } from '@/lib';
 import { EscrowAccount } from '@/types';
 import { useWallet } from '@solana/wallet-adapter-react';
 import RefundEscrowButton from './RefundEscrow';
-import useEscrowProgram from '@/hooks/useEscrowProgram';
+import useAnchorProvider from '@/hooks/useAnchorProvider';
 
 type Props = {
   data: EscrowAccount;
 };
 
-const EscrowCard = async ({ data }: Props) => {
+const EscrowCard = ({ data }: Props) => {
+  const provider = useAnchorProvider();
+  const [mintABalance, setMintABalance] = useState(0);
   const { publicKey } = useWallet();
-  const { getEscrowInfo } = useEscrowProgram();
   const isOwner = publicKey && data.account.maker.equals(publicKey);
-  const info = await getEscrowInfo(data.publicKey);
-  console.log(info, data);
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const balance = await getPdaTokenBalance(
+          provider.connection,
+          data.publicKey,
+          data.account.mintA
+        );
+        setMintABalance(balance);
+      } catch (error) {
+        setMintABalance(0);
+      }
+    };
+    fetchBalance();
+  }, [data.publicKey, data.account.mintA]);
+  
   return (
     <Box
       p={5}
@@ -139,7 +154,7 @@ const EscrowCard = async ({ data }: Props) => {
             <Text>You will receive:</Text>
           </Flex>
           <Flex align="center" color="teal.500" fontSize="sm">
-            <TokenAmount amount={data.account.receive.toString()} />
+            <TokenAmount amount={mintABalance} decimals={9} />
             <Text fontWeight="bold" ml={2} color="orange.600">
               A token
             </Text>

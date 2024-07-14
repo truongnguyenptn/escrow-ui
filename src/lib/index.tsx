@@ -7,7 +7,10 @@ import { TokenBalanceResponse } from '../types/index';
 import useAnchorProvider from '@/hooks/useAnchorProvider';
 import { AnchorProvider } from '@coral-xyz/anchor';
 
-export const isToken2022 = async (provider: AnchorProvider, mint: PublicKey) => {
+export const isToken2022 = async (
+  provider: AnchorProvider,
+  mint: PublicKey
+) => {
   const mintInfo = await provider.connection.getAccountInfo(mint);
   return mintInfo?.owner.equals(TOKEN_2022_PROGRAM_ID);
 };
@@ -104,3 +107,27 @@ export const logSignature = async (signature: string): Promise<string> => {
   );
   return signature;
 };
+
+export async function getPdaTokenBalance(
+  connection: Connection,
+  pda: PublicKey,
+  tokenMint: PublicKey
+) {
+  try {
+    // Fetch the token account associated with the PDA and the specific token mint
+    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(pda, {
+      mint: tokenMint,
+    });
+
+    if (tokenAccounts.value.length > 0) {
+      // Assuming the PDA has only one token account for the specific token mint
+      const tokenBalance =
+        tokenAccounts.value[0].account.data.parsed.info.tokenAmount.amount;
+      return tokenBalance;
+    } 
+    return null;
+  } catch (error) {
+    console.error('Error fetching token balance:', error);
+    throw new Error('Failed to fetch token balance.');
+  }
+}
