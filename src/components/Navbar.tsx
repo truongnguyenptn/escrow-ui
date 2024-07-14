@@ -114,7 +114,6 @@ const DesktopNav = () => {
   const linkHoverColor = 'white';
   const pathname = usePathname();
   const isActive = (href: string) => href === pathname;
-  console.log(pathname);
   const popoverContentBgColor = 'gray.800';
 
   return (
@@ -204,11 +203,16 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
 
 const MobileNav = () => {
   return (
-    <Stack bg="gray.800" p={4} mt={{ base: '40px', md: 0 }} display={{ base: 'block', md: 'none' }}>
-    {NAV_ITEMS.map((navItem) => (
-      <MobileNavItem key={navItem.label} {...navItem} />
-    ))}
-  </Stack>
+    <Stack
+      bg="gray.800"
+      p={4}
+      mt={{ base: '40px', md: 0 }}
+      display={{ base: 'block', md: 'none' }}
+    >
+      {NAV_ITEMS.map((navItem) => (
+        <MobileNavItem key={navItem.label} {...navItem} />
+      ))}
+    </Stack>
   );
 };
 

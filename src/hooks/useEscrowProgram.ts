@@ -218,8 +218,6 @@ export default function useEscrowProgram() {
           })
           .rpc();
 
-        console.log("Transaction submitted:", txid);
-
         const confirmation = await provider.connection.confirmTransaction(txid, "processed");
         console.log("Transaction confirmed:", confirmation);
 
