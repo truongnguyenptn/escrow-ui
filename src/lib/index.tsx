@@ -2,8 +2,15 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 import { Connection, PublicKey } from '@solana/web3.js';
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
 import { TokenBalanceResponse } from '../types/index';
+import useAnchorProvider from '@/hooks/useAnchorProvider';
+import { AnchorProvider } from '@coral-xyz/anchor';
+
+export const isToken2022 = async (provider: AnchorProvider, mint: PublicKey) => {
+  const mintInfo = await provider.connection.getAccountInfo(mint);
+  return mintInfo?.owner.equals(TOKEN_2022_PROGRAM_ID);
+};
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

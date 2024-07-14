@@ -8,7 +8,7 @@ const Escrows = () => {
   const { getEscrowAccounts } = useEscrowProgram();
   const [escrowAccounts, setEscrowAccounts] = useState<EscrowAccount[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  
   useEffect(() => {
     const fetchEscrowAccounts = async () => {
       setIsLoading(true);

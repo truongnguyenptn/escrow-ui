@@ -16,7 +16,7 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'The Escrow',
   description:
-    'Facilitate secure transactions on the Solana blockchain with an Escrow component. We ensure both parties fulfill their obligations before assets are released.',
+    'Facilitate secure transactions on the Solana blockchain with an Escrow service. We ensure both parties fulfill their obligations before assets are released.',
 };
 
 // Define the RootLayout component

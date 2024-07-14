@@ -17,7 +17,7 @@ const Home = () => {
       <VStack align="center" spacing={8}>
         <Text textAlign="center" fontSize="xl">
           Facilitate secure transactions on the Solana blockchain with the
-          Escrow component. <br />
+          Escrow service. <br />
           We ensure both parties fulfill their obligations before assets are
           released.
         </Text>

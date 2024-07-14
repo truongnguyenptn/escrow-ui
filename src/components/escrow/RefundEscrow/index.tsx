@@ -1,4 +1,3 @@
-'use client';
 import React, { useState, useRef } from 'react';
 import {
   AlertDialog,
@@ -11,34 +10,32 @@ import {
   Button,
   useToast,
 } from '@chakra-ui/react';
-import { BN } from '@coral-xyz/anchor';
-import useEscrowProgram from '@/hooks/useEscrowProgram';
 import { PublicKey } from '@solana/web3.js';
+import useEscrowProgram from '@/hooks/useEscrowProgram';
 
 type Props = {
-  receive: BN;
   escrow: PublicKey;
 };
 
-const TakeEscrow = ({ receive, escrow }: Props) => {
+const RefundEscrowButton = ({ escrow }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const onClose = () => setIsOpen(false);
   const cancelRef = useRef<HTMLButtonElement>(null);
-  const { takeEscrow } = useEscrowProgram();
+  const { refundEscrow } = useEscrowProgram();
   const toast = useToast();
 
-  const handleTake = async () => {
+  const handleRefund = async () => {
     toast({
-      title: 'Taking escrow...',
+      title: 'Processing refund...',
       status: 'loading',
       duration: 2000,
       isClosable: true,
     });
 
     try {
-      await takeEscrow({ escrow });
+      await refundEscrow({ escrow });
       toast({
-        title: 'Escrow taken',
+        title: 'Escrow successfully refunded',
         status: 'success',
         duration: 2000,
         isClosable: true,
@@ -46,7 +43,7 @@ const TakeEscrow = ({ receive, escrow }: Props) => {
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Failed to take escrow',
+        title: 'Error refunding escrow',
         status: 'error',
         duration: 2000,
         isClosable: true,
@@ -58,8 +55,8 @@ const TakeEscrow = ({ receive, escrow }: Props) => {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)} width="full">
-        Take
+      <Button onClick={() => setIsOpen(true)} size="sm" variant="ghost">
+        Refund Escrow
       </Button>
       <AlertDialog
         isOpen={isOpen}
@@ -68,19 +65,18 @@ const TakeEscrow = ({ receive, escrow }: Props) => {
       >
         <AlertDialogOverlay>
           <AlertDialogContent>
-            <AlertDialogHeader>Are you sure?</AlertDialogHeader>
+            <AlertDialogHeader>Confirm Refund</AlertDialogHeader>
             <AlertDialogCloseButton />
             <AlertDialogBody>
-              Are you sure you want to take this escrow? This action is
-              irreversible and will send {receive.toString()} of your token B to
-              the maker.
+              Are you sure you want to refund this escrow? This action cannot be
+              undone and the escrow will be deleted.
             </AlertDialogBody>
             <AlertDialogFooter>
               <Button ref={cancelRef} onClick={onClose}>
                 Cancel
               </Button>
-              <Button colorScheme="green" onClick={handleTake} ml={3}>
-                Take Escrow
+              <Button colorScheme="red" onClick={handleRefund} ml={3}>
+                Confirm Refund
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -90,4 +86,4 @@ const TakeEscrow = ({ receive, escrow }: Props) => {
   );
 };
 
-export default TakeEscrow;
+export default RefundEscrowButton;

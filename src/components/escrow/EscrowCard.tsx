@@ -9,6 +9,11 @@ import {
   Avatar,
   Divider,
   Icon,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  IconButton,
 } from '@chakra-ui/react';
 import {
   CircleUser,
@@ -16,18 +21,23 @@ import {
   CornerUpRight,
   CornerDownRight,
   Handshake,
+  Ellipsis,
 } from 'lucide-react';
 import TokenAmount from '../TokenAmount';
 import TakeEscrow from './TakeEscrow';
 import ExplorerLink from '../ExplorerLink';
 import { trimText } from '@/lib';
 import { EscrowAccount } from '@/types';
+import { useWallet } from '@solana/wallet-adapter-react';
+import RefundEscrowButton from './RefundEscrow';
 
 type Props = {
   data: EscrowAccount;
 };
 
 const EscrowCard = ({ data }: Props) => {
+  const { publicKey } = useWallet();
+  const isOwner = publicKey && data.account.maker.equals(publicKey);
   return (
     <Box
       p={5}
@@ -37,10 +47,22 @@ const EscrowCard = ({ data }: Props) => {
       cursor="pointer"
       _hover={{ borderColor: 'teal.500' }}
     >
-      {data.isOwner && (
-        <Text color="green.500" fontWeight="bold" mb={2}>
-          You are the owner of this escrow
-        </Text>
+      {isOwner && (
+        <Menu>
+          <MenuButton
+            as={IconButton}
+            aria-label="Options"
+            icon={<Ellipsis />}
+            variant="ghost"
+            size="sm"
+          />
+          <MenuList>
+            <MenuItem isDisabled>Owner&apos;s action</MenuItem>
+            <MenuItem>
+              <RefundEscrowButton escrow={data.publicKey} />
+            </MenuItem>
+          </MenuList>
+        </Menu>
       )}
       <Flex direction="column" gap={4}>
         <Flex align="center" justifyContent="center" mb={4}>
