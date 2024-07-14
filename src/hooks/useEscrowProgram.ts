@@ -91,9 +91,11 @@ export default function useEscrowProgram() {
         ? TOKEN_2022_PROGRAM_ID
         : TOKEN_PROGRAM_ID;
 
-      const [vault] = PublicKey.findProgramAddressSync(
-        [Buffer.from("vault"), escrow.toBuffer(), publicKey.toBuffer()],
-        program.programId
+      const vault = getAssociatedTokenAddressSync(
+        new PublicKey(escrowAccount.mintA),
+        escrow,
+        true,
+        tokenProgram
       );
 
       const makerAtaB = getAssociatedTokenAddressSync(
@@ -103,16 +105,18 @@ export default function useEscrowProgram() {
         tokenProgram
       );
 
-      const takerAtaA = await createAssociatedTokenAccountIfNotExists(
+      const takerAtaA = getAssociatedTokenAddressSync(
         new PublicKey(escrowAccount.mintA),
         publicKey,
-        publicKey
+        false,
+        tokenProgram
       );
 
-      const takerAtaB = await createAssociatedTokenAccountIfNotExists(
+      const takerAtaB = getAssociatedTokenAddressSync(
         new PublicKey(escrowAccount.mintB),
         publicKey,
-        publicKey
+        false,
+        tokenProgram
       );
 
       return program.methods
@@ -147,18 +151,18 @@ export default function useEscrowProgram() {
 
   const makeNewEscrow = useMutation({
     mutationKey: ['makeNewEscrow'],
-    mutationFn: async ({ mint_a, mint_b, deposit, receive }
-      : { mint_a: string, mint_b: string, deposit: number, receive: number }
+    mutationFn: async ({ mintA, mintB, deposit, receive }
+      : { mintA: string, mintB: string, deposit: number, receive: number }
     ) => {
       if (!publicKey) return;
       const seed = new BN(randomBytes(8));
 
-      const tokenProgram = (await isToken2022(provider, new PublicKey(mint_a)))
+      const tokenProgram = (await isToken2022(provider, new PublicKey(mintA)))
         ? TOKEN_2022_PROGRAM_ID
         : TOKEN_PROGRAM_ID;
 
       const makerAtaA = getAssociatedTokenAddressSync(
-        new PublicKey(mint_a),
+        new PublicKey(mintA),
         publicKey,
         false,
         tokenProgram
@@ -174,7 +178,7 @@ export default function useEscrowProgram() {
       );
 
       const vault = getAssociatedTokenAddressSync(
-        new PublicKey(mint_a),
+        new PublicKey(mintA),
         escrow,
         true,
         tokenProgram
@@ -190,8 +194,8 @@ export default function useEscrowProgram() {
           .make(seed, new BN(deposit), new BN(receive))
           .accounts({
             maker: publicKey,
-            mintA: new PublicKey(mint_a),
-            mintB: new PublicKey(mint_b),
+            mintA: new PublicKey(mintA),
+            mintB: new PublicKey(mintB),
             makerAtaA,
             vault,
             tokenProgram,

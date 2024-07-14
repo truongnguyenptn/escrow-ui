@@ -36,11 +36,10 @@ type Props = {
   data: EscrowAccount;
 };
 
-const EscrowCard = ({ data }: Props) => {
+const EscrowCard =  ({ data }: Props) => {
   const { publicKey } = useWallet();
   const { getEscrowInfo } = useEscrowProgram();
   const isOwner = publicKey && data.account.maker.equals(publicKey);
-  console.log(data, getEscrowInfo(data.publicKey));
   return (
     <Box
       p={5}

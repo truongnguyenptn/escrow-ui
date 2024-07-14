@@ -88,8 +88,8 @@ const MakeEscrow = ({ onFinished }: Props) => {
     try {
       const { tokenADeposit, tokenBReceive, mintA, mintB } = values;
       await makeNewEscrow.mutateAsync({
-        mint_a: mintA,
-        mint_b: mintB,
+        mintA,
+        mintB,
         deposit: tokenADeposit,
         receive: tokenBReceive,
       });
