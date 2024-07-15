@@ -140,18 +140,11 @@ export default function useEscrowProgram() {
         return []; // Return empty array if publicKey is not defined
       }
 
-      const filters = [
-        {
-          dataSize: 64, // Assuming account data size is 64 bytes
-          memcmp: {
-            offset: 32, // Assuming offset 32 is where `maker` PublicKey is located in your account data structure
-            bytes: publicKey.toBuffer(), // Replace publicKey with the actual PublicKey value
-          },
-        },
-      ];
+      const responses = await program.account.escrow.all() as EscrowAccount[];
 
-      const responses = await program.account.escrow.all(filters) as EscrowAccount[];
-      return responses.sort((a, b) => a.account.seed.cmp(b.account.seed));
+      const filteredAccounts = responses.filter(account => account.account.maker.equals(publicKey));
+
+      return filteredAccounts.sort((a, b) => a.account.seed.cmp(b.account.seed));
 
     }
   });
