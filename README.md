@@ -42,8 +42,10 @@ npm install
 Run the development server:
 npm run dev
 Open http://localhost:3000 in your browser to see the application.
-
+```
 ## Technologies Used
 Next.js: React framework for server-rendered React applications.
 Solana Blockchain: Infrastructure for decentralized applications.
 Tailwind CSS: Utility-first CSS framework for styling.
+
+## Video Demo: https://www.youtube.com/watch?v=VYi_g1lbQeg
