@@ -21,7 +21,7 @@ const Home = () => {
           We ensure both parties fulfill their obligations before assets are
           released.
         </Text>
-        <Escrows />
+        {/* <Escrows /> */}
       </VStack>
     </Box>
   );

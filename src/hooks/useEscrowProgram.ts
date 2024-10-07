@@ -1,4 +1,4 @@
-import { BN, Program } from "@coral-xyz/anchor";
+import { BN, Idl, Program } from "@coral-xyz/anchor";
 import useAnchorProvider from "./useAnchorProvider";
 import { randomBytes } from "crypto";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -17,7 +17,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 export default function useEscrowProgram() {
   const provider = useAnchorProvider();
   const { publicKey } = useWallet();
-  const program = new Program<AnchorEscrow>(escrowIDL as AnchorEscrow, provider);
+  const program = new Program(escrowIDL as Idl, "GqroybDr5ep6GHJnk9XpmL6aamr7GRAsBQtSoy7SJwRV", provider);
   const tokenProgram = TOKEN_PROGRAM_ID;
   const queryClient = useQueryClient();
 
